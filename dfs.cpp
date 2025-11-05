@@ -39,13 +39,13 @@ void calculate_dist(vector<int> &sumdist, vector<vector<int>> &adj, int n, int n
                     dist[j] = dist[u] + 1;
                     q.push(j);
                 }
-            }
-            int total=0;
-            for(int d:dist){
-                if(d>0) total+=d;
-            }
-            sumdist[i]=total;
+            } 
         }
+        int total=0;
+        for(int d:dist){
+            if(d>0) total+=d;
+        }
+        sumdist[i]=total;
     }
 }
 vector<vector<int>> detect(vector<vector<int>> &adj, int n){
