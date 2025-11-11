@@ -46,7 +46,7 @@ void createEdgesCSV(const string filePath)
         //closing the file pointers
         edges.close();
         data.close();
-        cout << "Succesfully wrote the edges.txt file";
+        cout << "Succesfully wrote the edges.txt file" << endl;
         //renaming edges.txt to edges.csv for better readability
         int success=rename("Dataset\\edges.txt","Dataset\\edges.csv");
         if(success==0)
@@ -123,7 +123,7 @@ void createNodesCSV(const string filePath)
         }
         //closing the file pointers
         nodes.close();
-        cout << "Succesfully wrote the nodes.txt file";
+        cout << "Succesfully wrote the nodes.txt file" << endl;
         //renaming edges.txt to edges.csv for better readability
         int success=rename("Dataset\\nodes.txt","Dataset\\nodes.csv");
         if(success==0)
@@ -140,4 +140,7 @@ int main()
     //filePath examples are:
     // 1.   "Dataset\\facebook_combined(UG).txt"
     // 2.   "Dataset\\twitter_combined(DG).txt"
+
+    // createEdgesCSV("Dataset\\twitter_combined(DG).txt");
+    // createNodesCSV("Dataset\\twitter_combined(DG).txt");
 }
