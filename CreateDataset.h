@@ -152,14 +152,4 @@ class CreateData
         else
             cout << RED << "Dataset/nodes.txt cannot be" << " not opened" << RESET << endl;
     }
-
-    int main()
-    {
-        //filePath examples are:
-        // 1.   "Dataset\\facebook_combined(UG).txt"
-        // 2.   "Dataset\\twitter_combined(DG).txt"
-
-        // createEdgesCSV("Dataset\\facebook_combined(UG).txt");
-        // createNodesCSV("Dataset\\facebook_combined(UG).txt");
-    }
 };
