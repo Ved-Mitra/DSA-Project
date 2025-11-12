@@ -33,8 +33,8 @@ void createEdgesCSV(const string filePath)
 
     if(data.is_open())
     {
-        cout << "Reading from " << filePath << " for Edges" << endl;
-        cout << "-----------------" << endl;
+        cout << CYAN << "Reading from " << filePath << " for Edges" << RESET << endl;
+        cout << CYAN << "-----------------" << RESET << endl;
         edges << "Node1" << "," << "Node2" << "," << "Weight" << '\n';//adding header
         while(getline(data,line))
         {
@@ -54,21 +54,21 @@ void createEdgesCSV(const string filePath)
         //closing the file pointers
         edges.close();
         data.close();
-        cout << "Succesfully wrote the edges.txt file" << endl;
+        cout << GREEN  <<  "Succesfully wrote the edges.txt file" << RESET << endl;
         //renaming edges.txt to edges.csv for better readability
         int success=rename("Dataset\\edges.txt","Dataset\\edges.csv");
         if(success==0)
-            cout << "Succesfully renamed edges.txt to edges.csv" << endl;
+            cout << GREEN << "Succesfully renamed edges.txt to edges.csv" <<  RESET << endl;
         else
-            cout << "Renaming Failed" << endl;
+            cout << RED << "Renaming Failed" <<  RESET << endl;
     }
     else
-        cout << filePath << " not opened" << endl;
+        cout << RED << filePath << " not opened" << RESET << endl;
 }
 
 void countUniqueIds(const string FilePath,set<string> &UniqueID)
 {
-    cout << "Starting the counting of nodes" << endl;
+    cout << CYAN << "Starting the counting of nodes" << RESET << endl;
     long long linesProcessed=0;//to count on what line the program is now 
     ifstream data(FilePath);
     if(data.is_open())
@@ -87,14 +87,14 @@ void countUniqueIds(const string FilePath,set<string> &UniqueID)
             linesProcessed++;
             if(linesProcessed%10000 == 0)
             {//just for checking progress at each point of time
-                cout << "Processed ..." << linesProcessed << " lines" << "\n";
+                cout << YELLOW << "Processed ..." << linesProcessed << " lines" << RESET << "\n";
             }
         }
-        cout << "Finished counting nodes" << '\n';
+        cout << GREEN << "Finished counting nodes" << RESET << '\n';
         data.close();
     }
     else
-        cout << "Counting of unique IDS failed" << "\n";
+        cout << RED << "Counting of unique IDS failed" << RESET <<"\n";
 }
 
 void createNodesCSV(const string filePath)
@@ -112,8 +112,8 @@ void createNodesCSV(const string filePath)
 
     if(nodes.is_open())
     {
-        cout << "Reading from " << filePath << " for Nodes" << endl;
-        cout << "-----------------" << endl;
+        cout << CYAN << "Reading from " << filePath << " for Nodes" << RESET << endl;
+        cout << CYAN  <<  "-----------------" << RESET << endl;
         nodes << "ID" << "," << "Domain" << "," << "Strength/skill expertise" << '\n';
         while(!UniqueID.empty())
         {
@@ -132,16 +132,16 @@ void createNodesCSV(const string filePath)
         }
         //closing the file pointers
         nodes.close();
-        cout << "Succesfully wrote the nodes.txt file" << endl;
+        cout <<  GREEN << "Succesfully wrote the nodes.txt file" << RESET << endl;
         //renaming edges.txt to edges.csv for better readability
         int success=rename("Dataset\\nodes.txt","Dataset\\nodes.csv");
         if(success==0)
-            cout << "Succesfully renamed nodes.txt to nodes.csv" << endl;
+            cout << GREEN << "Succesfully renamed nodes.txt to nodes.csv" << RESET << endl;
         else
-            cout << "Renaming Failed" << endl;
+            cout << RED << "Renaming Failed" << RESET << endl;
     }
     else
-        cout << "Dataset/nodes.txt cannot be" << " not opened" << endl;
+        cout << RED << "Dataset/nodes.txt cannot be" << " not opened" << RESET << endl;
 }
 
 int main()
