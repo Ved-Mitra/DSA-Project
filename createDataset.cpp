@@ -8,6 +8,13 @@ using namespace std;
 //strength -- >indicator of strength in there skill
 //domain --> domain of there work
 
+//color ANSI code for terminal printing
+const string RESET = "\033[0m";//white color 
+const string RED = "\033[31m";
+const string GREEN = "\033[32m";
+const string YELLOW = "\033[33m";
+const string CYAN = "\033[36m";
+
 void createEdgesCSV(const string filePath)
 {
     ifstream data(filePath);
@@ -20,7 +27,7 @@ void createEdgesCSV(const string filePath)
     uniform_int_distribution<> distribute(1,4);//maps the engines output to [1,4] both inclusive for random weight described in later part of code
     if(!edges.is_open())
     {
-        cout << "cannot open edges.txt file " << "Try Again" <<  "\n";
+        cout << RED << "cannot open edges.txt file " << "Try Again" << RESET << "\n";
         return;
     }
 
@@ -28,6 +35,7 @@ void createEdgesCSV(const string filePath)
     {
         cout << "Reading from " << filePath << " for Edges" << endl;
         cout << "-----------------" << endl;
+        edges << "Node1" << "," << "Node2" << "," << "Weight" << '\n';//adding header
         while(getline(data,line))
         {
             //now assigning random weights to edges according to the below chart
@@ -106,6 +114,7 @@ void createNodesCSV(const string filePath)
     {
         cout << "Reading from " << filePath << " for Nodes" << endl;
         cout << "-----------------" << endl;
+        nodes << "ID" << "," << "Domain" << "," << "Strength/skill expertise" << '\n';
         while(!UniqueID.empty())
         {
             //now assigning random weights to edges according to the below chart
