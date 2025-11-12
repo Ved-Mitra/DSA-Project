@@ -19,6 +19,8 @@ struct NodeData
     int domain;
     double strength;
 
+    NodeData(){}
+
     NodeData(string _id,int _domain,double _strength)
     {
         id=_id;
@@ -47,6 +49,13 @@ class Graph
     private:
     unordered_map<string,NodeData> NodeMap;
     unordered_map<string,vector<AdjListNode>> AdjList;
+    public:
+
+    Graph()
+    {
+        loadEdgesData();
+        loadNodesData();
+    }
 
     void loadEdgesData()//call loadNodesData() first
     {
@@ -122,19 +131,57 @@ class Graph
         }
     }
 
-    void DFS_detectCommunities(vector<string> &communities,string node,unordered_map<string,bool> &visited)
+    void DFS_detectCommunities(vector<string> &community,string node,unordered_map<string,bool> &visited)
     {
         visited[node]=true;
-        communities.push_back(node);
+        community.push_back(node);
         for(AdjListNode &x:AdjList[node])
         {
             if(!visited[x.adjacentNode])
-                DFS_detectCommunities(communities,x.adjacentNode,visited);
+                DFS_detectCommunities(community,x.adjacentNode,visited);
         }
     }
 
-    vector<vector<string>> detectCommunities()
+    void detectCommunities()
     {
-        
+        ofstream communities("communities.txt");
+        if(!communities.is_open())
+        {
+            cout << RED << "communities file cannot be opened" << RESET << endl;
+            return;
+        }
+        communities << "ID" << "," << "communityID" << '\n';//header for communities.csv
+        unordered_map<string,bool> visited;
+        for(auto &x:NodeMap)
+        {//storing all id as false
+            visited[x.first]=false;
+        }
+        int communityId=1;//to detect number of communities
+        for(auto &x:visited)
+        {
+            vector<string> community;
+            if(!x.second)
+            {
+                DFS_detectCommunities(community,x.first,visited);
+                communityId++;
+            }
+            for(auto &x:community)
+            {
+                //writing the communities in communities.txt
+                communities << x << "," << communityId << '\n';
+            }
+        }
+        //cout << communityId << endl;
+        communities.close();//just closing the file pointer
+        cout << GREEN << "Successfully identified Communities" <<  RESET << endl;
+        int rename_success=rename("communities.txt","communities.csv");//renaming the file from .txt to .csv
+        if(rename_success==0)
+        {
+            cout << GREEN << "Successfully renamed communities file " << RESET << endl;
+        }
+        else
+        {
+            cout << RED << "Renaming for communities failed" << RESET << endl;
+        }
     }
 };
