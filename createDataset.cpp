@@ -150,6 +150,6 @@ int main()
     // 1.   "Dataset\\facebook_combined(UG).txt"
     // 2.   "Dataset\\twitter_combined(DG).txt"
 
-    // createEdgesCSV("Dataset\\twitter_combined(DG).txt");
-    // createNodesCSV("Dataset\\twitter_combined(DG).txt");
+    // createEdgesCSV("Dataset\\facebook_combined(UG).txt");
+    // createNodesCSV("Dataset\\facebook_combined(UG).txt");
 }
