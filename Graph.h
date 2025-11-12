@@ -148,9 +148,9 @@ public:
         int communityId = 1; // to detect number of communities
         for (auto &x : visited)
         {
-            vector<string> community;
             if (!x.second)
             {
+                vector<string> community;
                 DFS_detectCommunities(community, x.first, visited);
                 for (auto &x : community)
                 {
@@ -160,7 +160,7 @@ public:
                 communityId++;
             }
         }
-        // cout << communityId << endl;
+        //cout << communityId << endl;
         communities.close(); // just closing the file pointer
         cout << GREEN << "Successfully identified Communities" << RESET << endl;
         int rename_success = rename("communities.txt", "communities.csv"); // renaming the file from .txt to .csv
@@ -250,7 +250,7 @@ public:
             node_count++;
             if (node_count % 1000 == 0)
             {
-                cout << YELLOW << "  Processed " << node_count << RESET << endl;
+                cout << YELLOW << "Processed " << node_count << RESET << endl;
             }
         }
 
