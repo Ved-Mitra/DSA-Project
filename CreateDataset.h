@@ -1,6 +1,7 @@
 #pragma once //this line tells the compiler to only inlcude this file once
 
 #include <bits/stdc++.h>
+#include "Constanst.h"
 using namespace std;
 
 //this code creates edge.csv ({U,V,Weight})
@@ -9,13 +10,6 @@ using namespace std;
 
 //strength -- >indicator of strength in there skill
 //domain --> domain of there work
-
-//color ANSI code for terminal printing
-const string RESET = "\033[0m";//white color 
-const string RED = "\033[31m";
-const string GREEN = "\033[32m";
-const string YELLOW = "\033[33m";
-const string CYAN = "\033[36m";
 
 class CreateData
 {
