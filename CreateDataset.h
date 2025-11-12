@@ -56,6 +56,9 @@ class CreateData
                 if(u.empty() || v.empty())
                     continue;
                 edges << u << "," << v << "," << random_Weight << "\n";
+                //undirected using this line
+                if(UNDIRECTED_GRAPH)
+                    edges << v << "," << u << "," << random_Weight << '\n';
             }
             //closing the file pointers
             edges.close();
