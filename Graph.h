@@ -275,7 +275,7 @@ public:
 
         //Normalizing the betweenness centrality score to ontain between 0.0 - 1.0
         double max_bc = 0.0;
-        int denominator= UNDIRECTED_GRAPH?2.0:1.0;//BRANDES ALGORITHM calculates twice for undirected graph just getting real score
+        double denominator= UNDIRECTED_GRAPH?2.0:1.0;//BRANDES ALGORITHM calculates twice for undirected graph just getting real score
         for (auto const &x : bc_scores)
         {
             double corrected_score = x.second/denominator;
@@ -360,7 +360,8 @@ public:
                 continue;
             
             int domainSimilarity=(x.second.domain==targetUser.domain)?1:0;
-            double proximity=(effectiveDistance[x.second.id]==(double)INT_MAX)?0.0:effectiveDistance[x.second.id];
+            double distance=(effectiveDistance[x.second.id]==(double)INT_MAX)?0.0:effectiveDistance[x.second.id];
+            double proximity=1.0/(1.0+distance);
             double strengthFactor=(targetUser.strength+x.second.strength)/20.0; //dividing by 2 to get average to avoid a high skill person to connect to low skill person and dividing by 10 to normalize the strengthFactor
             double bc_score=x.second.normalized_bc;//normalized betweenness centrality score
             
@@ -381,19 +382,29 @@ public:
         cout << CYAN << "Top 5 Recommedation for " << startNode << " are:" << endl;
         cout << YELLOW << "ID   Domain   Strength   BC_Score   Final Score" << RESET << endl;
         recommedate << "ID,Domain,Strength,Betweenness Score,Final Score" << '\n';
-        for(int i=0;i<5;)//printing top 5 recommedation
+
+        int cnt=0;//to track the number of recommedations given
+        for(int i=0;cnt<5 && i<recommedation.size();i++)//printing top 5 recommedation
         {
             string ID=recommedation[i].second;
+            bool already_connected=false;
             for(auto &x:AdjList[startNode])
             {
+                //to avoid recommedation to adjacent nodes
                 if(ID==x.adjacentNode)
-                    continue;
+                {
+                    already_connected=true;
+                    break;
+                }                
             }
+            if(already_connected)
+                continue;
+
             //printing
             cout << recommedation[i].second << '\t' << NodeMap[recommedation[i].second].domain << '\t' << NodeMap[recommedation[i].second].strength << '\t' << NodeMap[recommedation[i].second].normalized_bc << '\t' << recommedation[i].first << '\n';
             //writing in recommedation.csv
             recommedate << recommedation[i].second << "," << NodeMap[recommedation[i].second].domain << "," << NodeMap[recommedation[i].second].strength << "," << NodeMap[recommedation[i].second].normalized_bc << "," << recommedation[i].first << '\n';
-            i++;
+            cnt++;
         }
         recommedate.close();//closing file pointer
     }
@@ -403,9 +414,9 @@ public:
         //to get the nodes with max Global recommedation score in among the communities 
         pair<string,string> bridgerecommed={"_","_"};
         double maxScore=0.0; 
-        for(auto &u:communityArr[community1-1])
+        for(auto &u:communityArr[community1])
         {
-            for(auto &v:communityArr[community2-1])
+            for(auto &v:communityArr[community2])
             {
                 if(u==v)
                     continue;
@@ -443,7 +454,7 @@ public:
 
         for(int i=0;i<numberOfCommunity;i++)
         {
-            if(i==targetUser.communityID)
+            if(i==targetUser.communityID-1)
                 continue;
 
             //community1 node , community2 node
@@ -458,8 +469,9 @@ public:
             {
                 unordered_map<string,double> dist_ith_community_from_Global_Bridge_Recommedation=DijsktraAlgorithm(globalBridge.second);//to store distance of all nodes from global recommedated node in second community
 
-                int domainSimilarity=(targetUser.domain==NodeMap[x].domain)?0.0:1.0;
-                double proximity=dist_startNode_community[globalBridge.first] + 1 + dist_ith_community_from_Global_Bridge_Recommedation[x];//sum of distance from startNode to global bridge recommedation node + 1 + distance from global node recommedation in 2nd community to x node
+                double domainSimilarity=(targetUser.domain==NodeMap[x].domain)?0.0:1.0;
+                double total_distance=dist_startNode_community[globalBridge.first] + 1 + dist_ith_community_from_Global_Bridge_Recommedation[x];//sum of distance from startNode to global bridge recommedation node + 1 + distance from global node recommedation in 2nd community to x node
+                double proximity=1.0/(1.0+total_distance);
                 double strengthBalance=(targetUser.strength+NodeMap[x].strength)/20.0;//dividing by 20.0 to normalize strength(10.0) and also take average(2.0)
                 double normalized_BC_score=(NodeMap[targetUser.id].normalized_bc+NodeMap[x].normalized_bc)/2.0;//to take average of betweenness centrality
 
@@ -473,20 +485,20 @@ public:
             sort(bridgeRecommedationCommunity.begin(),bridgeRecommedationCommunity.end(),greater<pair<double,string>>());
 
             double topScore_in_ith_Community=0.0;
-            for(int i=0;i<3;i++)
+            for(int j=0;j<3;j++)
             {
                 //taking top3 nodes score and taking average
-                topScore_in_ith_Community+=bridgeRecommedationCommunity[i].first;
+                topScore_in_ith_Community+=bridgeRecommedationCommunity[j].first;
             }
             
             if(topScore_in_ith_Community>TopScoreOfCommunity)
             {
                 //storing the community with top score
                 TopScoreOfCommunity=topScore_in_ith_Community;
-                for(int i=0;i<3;i++)
+                for(int j=0;j<3;j++)
                 {
-                    bridgeRecommedate[i].second=bridgeRecommedationCommunity[i].second;
-                    bridgeRecommedate[i].first=bridgeRecommedationCommunity[i].first;
+                    bridgeRecommedate[j].second=bridgeRecommedationCommunity[j].second;
+                    bridgeRecommedate[j].first=bridgeRecommedationCommunity[j].first;
                 }
                 TopCommunity=i;
             }            

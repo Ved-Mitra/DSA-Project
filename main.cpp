@@ -4,7 +4,7 @@ using namespace std;
 #include "CreateDataset.h"
 #include "Graph.h"
 
-const string filePath="Dataset\\dataset.txt";
+const string filePath="Dataset/dataset.txt";
 
 int main()
 {

@@ -4,8 +4,8 @@
 using namespace std;
 
 
-const string EDGESFILEPATH= "Dataset\\edges.csv";
-const string NODESFILEPATH= "Dataset\\nodes.csv";
+const string EDGESFILEPATH= "Dataset/edges.csv";
+const string NODESFILEPATH= "Dataset/nodes.csv";
 const string COMMUNITIES="communities.csv";
 const string BETWEENNESS_CENTRALITY="centrality.csv";
 const string RECOMMEDATION="recommedation.csv";

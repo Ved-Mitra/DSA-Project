@@ -136,7 +136,7 @@ class CreateData
                 string ID= *UniqueID.begin();
                 UniqueID.erase(UniqueID.begin());
 
-                nodes << ID << "," << random_domain << "," << setprecision(2) << random_strength << "\n";
+                nodes << ID << "," << random_domain << "," << fixed << setprecision(2) << random_strength << "\n";
             }
             //closing the file pointers
             nodes.close();
