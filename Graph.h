@@ -522,4 +522,60 @@ public:
         }
         BridgeRecommedationFile.close();//closing the file pointer
     }
+const double BASE_COST=1.0;
+const double DEPLOY_COST=2.0;
+    double CostCalculation(string startNode)
+{
+    if (NodeMap.find(startNode) == NodeMap.end())
+    {
+        cout << RED << "Invalid start node ID: " << startNode << RESET << endl;
+        return -1;
+    }
+
+    double totalCost = 0.0;
+    int roundCount = 0;
+
+    unordered_set<string> informed;
+    unordered_set<string> newly_informed;
+
+    informed.insert(startNode);
+    newly_informed.insert(startNode);
+
+    while (!newly_informed.empty())
+    {
+        unordered_set<string> nextRound;
+        roundCount++;
+
+        for (const string &u : newly_informed)
+        {
+            for (auto &neigh : AdjList[u])
+            {
+                string v = neigh.adjacentNode;
+                int wt = neigh.weight;
+
+                if (informed.find(v) == informed.end())
+                {
+                    double cost = BASE_COST / (double)wt; 
+                    totalCost += cost;
+                    nextRound.insert(v);
+                    informed.insert(v);
+                }
+            }
+        }
+
+        newly_informed = nextRound;
+    }
+
+    cout << GREEN << "Information reached " << informed.size() << " / "
+         << NodeMap.size() << " nodes in " << roundCount << " rounds." << RESET << endl;
+
+    cout << YELLOW << "Total cost of information spread from " << startNode
+         << " = " << fixed << setprecision(6) << totalCost << RESET << endl;
+
+    return totalCost;
+}
+
+
+
+
 };
