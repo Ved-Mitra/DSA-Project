@@ -574,8 +574,63 @@ const double DEPLOY_COST=2.0;
 
     return totalCost;
 }
+void CompareCost(pair<string, string> bridge)
+{
+    string u = bridge.first;
+    string v = bridge.second;
 
+    if (NodeMap.find(u) == NodeMap.end() || NodeMap.find(v) == NodeMap.end())
+    {
+        cout << RED << "Invalid bridge nodes provided." << RESET << endl;
+        return;
+    }
+
+    cout << CYAN << "=== Comparing Information Spread Cost Before and After Bridging ===" << RESET << endl;
+    cout << "Bridge: (" << u << ", " << v << ")" << endl;
+
+    // Cost before adding bridge
+    double costBeforeU= DEPLOY_COST+CostCalculation(u);
+    double costBeforeV= DEPLOY_COST+CostCalculation(v);
+    double totalCostBefore = costBeforeU + costBeforeV;
+
+    // Add temporary bridge
+    AdjList[u].push_back(AdjListNode(v, 1)); // neutral weight = 1
+    AdjList[v].push_back(AdjListNode(u, 1));
+
+    // Cost after adding bridge
+    double costAfterU= DEPLOY_COST+CostCalculation(u);
+    double totalCostAfter= costAfterU;
+
+    // Restore original graph (remove temporary bridge)
+    AdjList[u].pop_back();
+    AdjList[v].pop_back();
+
+    // Compute improvement %
+    double improvement = ((totalCostBefore - totalCostAfter) / totalCostBefore) * 100.0;
+
+    cout << CYAN << "=== COST COMPARISON RESULTS ===" << RESET << endl;
+    cout << "Before Bridging : " << YELLOW << fixed << setprecision(6) << totalCostBefore << RESET << endl;
+    cout << "After Bridging  : " << GREEN << fixed << setprecision(6) << totalCostAfter << RESET << endl;
+    cout << "Improvement     : " << fixed << setprecision(2)
+         << improvement << "% reduction in total cost" << endl;
+
+    // Save results (append mode)
+    ofstream resultsFile("InformationCostComparison.csv", ios::app);
+    if (resultsFile.is_open())
+    {
+        resultsFile << u << "," << v << ","
+                    << fixed << setprecision(6)
+                    << totalCostBefore << "," << totalCostAfter << ","
+                    << improvement << "\n";
+        resultsFile.close();
+    }
+    else
+    {
+        cout << RED << "Could not write results to InformationCostComparison.csv" << RESET << endl;
+    }
+}
 
 
 
 };
+
