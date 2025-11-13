@@ -15,4 +15,5 @@ int main()
     sniegraph.betweennessCentrality();//calculating betweenesscentrality
 
     sniegraph.Recommedation("34");
+    sniegraph.BridgeRecommedation("40");
 }
