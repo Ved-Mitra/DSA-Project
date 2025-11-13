@@ -458,7 +458,7 @@ public:
                 continue;
 
             //community1 node , community2 node
-            pair<string,string> globalBridge=GlobalBridgeRecommedation(targetUser.communityID,i);
+            pair<string,string> globalBridge=GlobalBridgeRecommedation(targetUser.communityID-1,i);
             //these nodes in globalBridge would act as connecting nodes for the two community and we would then direct a path from them from one communtiy to another to recommend bridge connections between communities
             if(globalBridge.first=="_" || globalBridge.second=="_")
                 continue;
@@ -500,7 +500,7 @@ public:
                     bridgeRecommedate[j].second=bridgeRecommedationCommunity[j].second;
                     bridgeRecommedate[j].first=bridgeRecommedationCommunity[j].first;
                 }
-                TopCommunity=i;
+                TopCommunity=i+1;//as communityID is 1-indexed based
             }            
         }
         cout << GREEN << "Successfully completed Bridge Recommedation" << RESET << endl;
