@@ -43,6 +43,8 @@ private:
     unordered_map<string, NodeData> NodeMap;
     unordered_map<string, vector<AdjListNode>> AdjList;
     vector<vector<double>> domainComplimentarity;
+    vector<vector<string>> communityArr;
+    int numberOfCommunity;
 
     void loadEdgesData() // call loadNodesData() first
     {
@@ -127,6 +129,7 @@ public:
         domainComplimentarity.push_back({0.1,0.5,0.3,0.45});
         domainComplimentarity.push_back({0.55,0.1,0.45,0.35});
         domainComplimentarity.push_back({0.6,0.4,0.45,0.65});
+        numberOfCommunity=0;
     }
 
     void DFS_detectCommunities(vector<string> &community, string node, unordered_map<string, bool> &visited)
@@ -169,9 +172,11 @@ public:
                     //allcating communityID
                     NodeMap[x].communityID=communityId;
                 }
+                communityArr.push_back(community);
                 communityId++;
             }
         }
+        numberOfCommunity=communityId-1;
         //cout << communityId << endl;
         communities.close(); // just closing the file pointer
         cout << GREEN << "Successfully identified Communities" << RESET << endl;
@@ -375,42 +380,134 @@ public:
 
         cout << CYAN << "Top 5 Recommedation for " << startNode << " are:" << endl;
         cout << YELLOW << "ID   Domain   Strength   BC_Score   Final Score" << RESET << endl;
-        recommedate << "ID,Domain,Strength,Betweenness Score,Fical Score" << '\n';
-        for(int i=0;i<5;i++)//printing top 5 recommedation
+        recommedate << "ID,Domain,Strength,Betweenness Score,Final Score" << '\n';
+        for(int i=0;i<5;)//printing top 5 recommedation
         {
+            string ID=recommedation[i].second;
+            for(auto &x:AdjList[startNode])
+            {
+                if(ID==x.adjacentNode)
+                    continue;
+            }
             //printing
             cout << recommedation[i].second << '\t' << NodeMap[recommedation[i].second].domain << '\t' << NodeMap[recommedation[i].second].strength << '\t' << NodeMap[recommedation[i].second].normalized_bc << '\t' << recommedation[i].first << '\n';
             //writing in recommedation.csv
             recommedate << recommedation[i].second << "," << NodeMap[recommedation[i].second].domain << "," << NodeMap[recommedation[i].second].strength << "," << NodeMap[recommedation[i].second].normalized_bc << "," << recommedation[i].first << '\n';
+            i++;
         }
         recommedate.close();//closing file pointer
     }
 
-    pair<string,string> GlobalBridgeScore()
+    pair<string,string> GlobalBridgeRecommedation(int community1,int community2)
     {
+        //to get the nodes with max Global recommedation score in among the communities 
         pair<string,string> bridgerecommed={"_","_"};
         double maxScore=0.0; 
-        for(auto &u:NodeMap)
+        for(auto &u:communityArr[community1-1])
         {
-            for(auto &v:NodeMap)
+            for(auto &v:communityArr[community2-1])
             {
-                if(u.first==v.first)
+                if(u==v)
                     continue;
-                int communityDifferentiator=(u.second.communityID==v.second.communityID)?0.0:1.0;//to help link only different communities;
-                double score=u.second.normalized_bc*v.second.normalized_bc*(domainComplimentarity[u.second.domain-1][v.second.domain-1])*((u.second.strength+v.second.strength)/20.0)*communityDifferentiator;
+                double StrengthFactor=(NodeMap[u].strength+NodeMap[v].strength)/20.0;
+
+                //Global Bridge Score = BC_A(i) × BC_B(j) × DomainComplementarity × StrengthBalance
+                double score=NodeMap[u].normalized_bc*NodeMap[v].normalized_bc*(domainComplimentarity[NodeMap[u].domain-1][NodeMap[v].domain-1])*StrengthFactor;
                 if(score>maxScore)
                 {
-                    bridgerecommed.first=u.second.id;
-                    bridgerecommed.second=v.second.id;
+                    bridgerecommed.first=u;
+                    bridgerecommed.second=v;
                 }
             }
         }
         return bridgerecommed;
     }
 
-
-    void BridgeRecommedation()
+    void BridgeRecommedation(string startNode)
     {
-        
+        if(NodeMap.find(startNode)==NodeMap.end())
+        {
+            cout << RED << "Node don't exist" << RESET << endl;
+            return;
+        }
+
+        NodeData targetUser=NodeMap[startNode];
+        cout << CYAN << "Starting Bridge Recommedation Engine for " << startNode << "(Community: " << targetUser.communityID << ")" << endl;
+
+        //transversing by community
+        vector<pair<double,string>> bridgeRecommedate(3);//store the highest score for bridge connection by from a community from the startNode community
+        double TopScoreOfCommunity=0.0;
+        int TopCommunity=0;
+
+        unordered_map<string,double> dist_startNode_community=DijsktraAlgorithm(startNode);//to store shortest path from startNode in startNode's community
+
+        for(int i=0;i<numberOfCommunity;i++)
+        {
+            if(i==targetUser.communityID)
+                continue;
+
+            //community1 node , community2 node
+            pair<string,string> globalBridge=GlobalBridgeRecommedation(targetUser.communityID,i);
+            //these nodes in globalBridge would act as connecting nodes for the two community and we would then direct a path from them from one communtiy to another to recommend bridge connections between communities
+            if(globalBridge.first=="_" || globalBridge.second=="_")
+                continue;
+            
+            vector<pair<double,string>> bridgeRecommedationCommunity;//to store the score for current Bridge recommedation of cummonity
+
+            for(auto &x:communityArr[i])
+            {
+                unordered_map<string,double> dist_ith_community_from_Global_Bridge_Recommedation=DijsktraAlgorithm(globalBridge.second);//to store distance of all nodes from global recommedated node in second community
+
+                int domainSimilarity=(targetUser.domain==NodeMap[x].domain)?0.0:1.0;
+                double proximity=dist_startNode_community[globalBridge.first] + 1 + dist_ith_community_from_Global_Bridge_Recommedation[x];//sum of distance from startNode to global bridge recommedation node + 1 + distance from global node recommedation in 2nd community to x node
+                double strengthBalance=(targetUser.strength+NodeMap[x].strength)/20.0;//dividing by 20.0 to normalize strength(10.0) and also take average(2.0)
+                double normalized_BC_score=(NodeMap[targetUser.id].normalized_bc+NodeMap[x].normalized_bc)/2.0;//to take average of betweenness centrality
+
+                //calculating final score
+                double score=ALPHA*(1-domainSimilarity) + BETA*(proximity) + GAMMA*strengthBalance + DELTA*normalized_BC_score;
+
+                bridgeRecommedationCommunity.push_back({score,x});
+            }
+
+            //sorting bridge recommedation for this community
+            sort(bridgeRecommedationCommunity.begin(),bridgeRecommedationCommunity.end(),greater<pair<double,string>>());
+
+            double topScore_in_ith_Community=0.0;
+            for(int i=0;i<3;i++)
+            {
+                //taking top3 nodes score and taking average
+                topScore_in_ith_Community+=bridgeRecommedationCommunity[i].first;
+            }
+            
+            if(topScore_in_ith_Community>TopScoreOfCommunity)
+            {
+                //storing the community with top score
+                TopScoreOfCommunity=topScore_in_ith_Community;
+                for(int i=0;i<3;i++)
+                {
+                    bridgeRecommedate[i].second=bridgeRecommedationCommunity[i].second;
+                    bridgeRecommedate[i].first=bridgeRecommedationCommunity[i].first;
+                }
+                TopCommunity=i;
+            }            
+        }
+        cout << GREEN << "Successfully completed Bridge Recommedation" << RESET << endl;
+
+        ofstream BridgeRecommedationFile(BRIDGE_RECOMMEDATION);
+        if(!BridgeRecommedationFile.is_open())
+        {
+            cout << RED << "Cannot write Bridge Recommedation " << RESET << endl;
+        }
+        cout << YELLOW << "Top 3 Bridge Recommedation from " << startNode << "of community " << targetUser.communityID << " to community " << TopCommunity << endl;
+        BridgeRecommedationFile << "ID,Domain,Strength,Betweenness,Final Score\n";
+        cout << "ID\tDomain\tStrength\tBetweenness\tCommunityID\tFinal Score" << endl;
+        for(int i=0;i<3;i++)
+        {
+            //writing recommedation in file .csv
+            BridgeRecommedationFile << bridgeRecommedate[i].second << "," << NodeMap[bridgeRecommedate[i].second].domain << "," << NodeMap[bridgeRecommedate[i].second].strength << "," << NodeMap[bridgeRecommedate[i].second].normalized_bc << "," << bridgeRecommedate[i].first << '\n';
+            //printing bridge recommedation
+            cout << bridgeRecommedate[i].second << "\t" << NodeMap[bridgeRecommedate[i].second].domain << "\t" << NodeMap[bridgeRecommedate[i].second].strength << "\t" << NodeMap[bridgeRecommedate[i].second].normalized_bc << "\t" << TopCommunity << "\t" << bridgeRecommedate[i].first << '\n';
+        }
+        BridgeRecommedationFile.close();//closing the file pointer
     }
 };
