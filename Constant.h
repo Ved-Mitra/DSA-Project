@@ -9,6 +9,7 @@ const string NODESFILEPATH= "Dataset\\nodes.csv";
 const string COMMUNITIES="communities.csv";
 const string BETWEENNESS_CENTRALITY="centrality.csv";
 const string RECOMMEDATION="recommedation.csv";
+const string BRIDGE_RECOMMEDATION="bridgeRecommedation.csv";
 
 //to be decided
 const double ALPHA=0.5;
