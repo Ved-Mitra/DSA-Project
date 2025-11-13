@@ -1,7 +1,7 @@
 #pragma once // this line tells the compiler to only inlcude this file once
 
 #include <bits/stdc++.h>
-#include "Constanst.h"
+#include "Constant.h"
 using namespace std;
 
 struct NodeData
@@ -170,15 +170,15 @@ public:
         //cout << communityId << endl;
         communities.close(); // just closing the file pointer
         cout << GREEN << "Successfully identified Communities" << RESET << endl;
-        int rename_success = rename("communities.txt", "communities.csv"); // renaming the file from .txt to .csv
-        if (rename_success == 0)
-        {
-            cout << GREEN << "Successfully renamed communities file " << RESET << endl;
-        }
-        else
-        {
-            cout << RED << "Renaming for communities failed" << RESET << endl;
-        }
+        // int rename_success = rename("communities.txt", "communities.csv"); // renaming the file from .txt to .csv
+        // if (rename_success == 0)
+        // {
+        //     cout << GREEN << "Successfully renamed communities file " << RESET << endl;
+        // }
+        // else
+        // {
+        //     cout << RED << "Renaming for communities failed" << RESET << endl;
+        // }
     }
 
     void betweennessCentrality()
@@ -303,6 +303,81 @@ public:
         cout << GREEN << "Successfully computed and saved Betweenness Centrality." << RESET << endl;
     }
 
-    
+    unordered_map<string,double> DijsktraAlgorithm(string startNode)
+    {
+        //running Dijsktra using priority_queue
+        priority_queue<pair<double,string>,vector<pair<double,string>>,greater<pair<double,string>>> pq;
+        unordered_map<string,double> dist;
+        for(auto &x:NodeMap)
+            dist[x.first]=(double)INT_MAX;
+        dist[startNode]=0.0;
+        pq.push({0.0,startNode});
+        while(!pq.empty())
+        {
+            string node=pq.top().second;
+            double dNode=pq.top().first;
+            pq.pop();
+            for(auto &x:AdjList[node])
+            {
+                //more is weight the closer is the relation
+                double effectiveDistance=1/(double)x.weight;
+                double newDist=dNode+effectiveDistance;
+                if(dist[x.adjacentNode]>newDist)
+                {
+                    dist[x.adjacentNode]=newDist;
+                    pq.push({newDist,x.adjacentNode});
+                }
+            }
+        }
+        return dist;
+    }
 
+    void Recommedation(string startNode)
+    {
+        if(NodeMap.find(startNode)==NodeMap.end())
+        {
+            cout << RED << "No node with this id" << RESET << endl;
+            return;
+        }
+        unordered_map<string,double> effectiveDistance=DijsktraAlgorithm(startNode);
+        
+        cout << CYAN << "Starting recommedation Engine " << RESET << endl;
+        vector<pair<double,string>> recommedation;
+        NodeData targetUser=NodeMap[startNode];
+        for(auto &x:NodeMap)
+        {
+            if(x.second.id==targetUser.id)
+                continue;
+            
+            int domainSimilarity=(x.second.domain==targetUser.domain)?1:0;
+            double proximity=(effectiveDistance[x.second.id]==(double)INT_MAX)?0.0:effectiveDistance[x.second.id];
+            double strengthFactor=(targetUser.strength+x.second.strength)/20.0; //dividing by 2 to get average to avoid a high skill person to connect to low skill person and dividing by 10 to normalize the strengthFactor
+            double bc_score=x.second.normalized_bc;//normalized betweenness centrality score
+            
+            //calculating recommedation score
+            double score= ALPHA*domainSimilarity + BETA*proximity + GAMMA*strengthFactor + DELTA*bc_score;
+            recommedation.push_back({score,x.second.id});
+        }
+
+        sort(recommedation.begin(),recommedation.end(),greater<pair<double,string>>());
+        ofstream recommedate(RECOMMEDATION);
+        if(!recommedate.is_open())
+        {
+            cout << RED << "Cannot write in recommedation.csv" << RESET << endl;
+        }
+
+        cout << GREEN << "Recommadation generated successfully" << RESET << endl;
+
+        cout << CYAN << "Top 5 Recommedation for " << startNode << " are:" << endl;
+        cout << YELLOW << "ID\tDomain\tStrength\tBC_Score\tFinal Score" << RESET << endl;
+        recommedate << "ID,Domain,Strength,Betweenness Score,Fical Score" << '\n';
+        for(int i=0;i<5;i++)//printing top 5 recommedation
+        {
+            //printing
+            cout << recommedation[i].second << '\t' << NodeMap[recommedation[i].second].domain << '\t' << NodeMap[recommedation[i].second].strength << '\t' << NodeMap[recommedation[i].second].normalized_bc << '\t' << recommedation[i].first << '\n';
+            //writing in recommedation.csv
+            recommedate << recommedation[i].second << "," << NodeMap[recommedation[i].second].domain << "," << NodeMap[recommedation[i].second].strength << "," << NodeMap[recommedation[i].second].normalized_bc << "," << recommedation[i].first << '\n';
+        }
+        recommedate.close();//closing file pointer
+    }
 };
