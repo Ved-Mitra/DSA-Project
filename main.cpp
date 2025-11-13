@@ -13,4 +13,6 @@ int main()
     Graph sniegraph;
     sniegraph.detectCommunities();//detecting communities
     sniegraph.betweennessCentrality();//calculating betweenesscentrality
+
+    sniegraph.Recommedation("0");
 }
