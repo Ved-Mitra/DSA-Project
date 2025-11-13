@@ -369,7 +369,7 @@ public:
         cout << GREEN << "Recommadation generated successfully" << RESET << endl;
 
         cout << CYAN << "Top 5 Recommedation for " << startNode << " are:" << endl;
-        cout << YELLOW << "ID\tDomain\tStrength\tBC_Score\tFinal Score" << RESET << endl;
+        cout << YELLOW << "ID   Domain   Strength   BC_Score   Final Score" << RESET << endl;
         recommedate << "ID,Domain,Strength,Betweenness Score,Fical Score" << '\n';
         for(int i=0;i<5;i++)//printing top 5 recommedation
         {
