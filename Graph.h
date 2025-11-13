@@ -510,7 +510,7 @@ public:
         {
             cout << RED << "Cannot write Bridge Recommedation " << RESET << endl;
         }
-        cout << YELLOW << "Top 3 Bridge Recommedation from " << startNode << "of community " << targetUser.communityID << " to community " << TopCommunity << endl;
+        cout << YELLOW << "Top 3 Bridge Recommedation from " << startNode << "of community " << targetUser.communityID << " to community " << TopCommunity << RESET << endl;
         BridgeRecommedationFile << "ID,Domain,Strength,Betweenness,Final Score\n";
         cout << "ID\tDomain\tStrength\tBetweenness\tCommunityID\tFinal Score" << endl;
         for(int i=0;i<3;i++)
