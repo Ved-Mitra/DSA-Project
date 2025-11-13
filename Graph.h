@@ -10,7 +10,11 @@ struct NodeData
     int domain;
     double strength;
 
-    NodeData() {}
+    //used in detecting community and computing betweenness centrality
+    double normalized_bc=0.0;
+    int communityID=-1;
+
+    NodeData() {}//if value is found i.e. node already exist but needs updating not necessary (as this condition would never be encountered) but for compilation reason added
 
     NodeData(string _id, int _domain, double _strength)
     {
@@ -156,6 +160,9 @@ public:
                 {
                     // writing the communities in communities.txt
                     communities << x << "," << communityId << '\n';
+
+                    //allcating communityID
+                    NodeMap[x].communityID=communityId;
                 }
                 communityId++;
             }
@@ -250,7 +257,7 @@ public:
             node_count++;
             if (node_count % 1000 == 0)
             {
-                cout << YELLOW << "Processed " << node_count << RESET << endl;
+                cout << YELLOW << "Processed " << node_count << "/" << NodeMap.size() <<  RESET << endl;
             }
         }
 
@@ -282,6 +289,9 @@ public:
             {
                 double normalized_score = x.second / max_bc;
                 centrality_file << x.first << "," << fixed << setprecision(8) << normalized_score << "\n";
+
+                //storing the normalized_bc score for each node
+                NodeMap[x.first].normalized_bc=normalized_score;
             }
             else
             {
@@ -292,4 +302,7 @@ public:
         centrality_file.close();//closing the file pointer
         cout << GREEN << "Successfully computed and saved Betweenness Centrality." << RESET << endl;
     }
+
+    
+
 };
