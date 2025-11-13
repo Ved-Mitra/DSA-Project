@@ -381,7 +381,7 @@ public:
 
         cout << CYAN << "Top 5 Recommedation for " << startNode << " are:" << endl;
         cout << YELLOW << "ID   Domain   Strength   BC_Score   Final Score" << RESET << endl;
-        recommedate << "ID,Domain,Strength,Betweenness Score,Final Score" << '\n';
+        recommedate << "ID,Domain,Strength,Betweenness,Final Score" << '\n';
 
         int cnt=0;//to track the number of recommedations given
         for(int i=0;cnt<5 && i<recommedation.size();i++)//printing top 5 recommedation

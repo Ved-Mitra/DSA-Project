@@ -40,7 +40,7 @@ class CreateData
         {
             cout << CYAN << "Reading from " << filePath << " for Edges" << RESET << endl;
             cout << CYAN << "-----------------" << RESET << endl;
-            edges << "Node1" << "," << "Node2" << "," << "Weight" << '\n';//adding header
+            edges << "u" << "," << "v" << "," << "weight" << '\n';//adding header
             while(getline(data,line))
             {
                 //now assigning random weights to edges according to the below chart
@@ -122,7 +122,7 @@ class CreateData
         {
             cout << CYAN << "Reading from " << filePath << " for Nodes" << RESET << endl;
             cout << CYAN  <<  "-----------------" << RESET << endl;
-            nodes << "ID" << "," << "Domain" << "," << "Strength/skill expertise" << '\n';
+            nodes << "id" << "," << "domain" << "," << "strength" << '\n';
             while(!UniqueID.empty())
             {
                 //now assigning random weights to edges according to the below chart
