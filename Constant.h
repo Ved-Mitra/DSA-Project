@@ -11,10 +11,10 @@ const string BETWEENNESS_CENTRALITY="centrality.csv";
 const string RECOMMEDATION="recommedation.csv";
 
 //to be decided
-const double ALPHA=0.0;
-const double BETA=0.0;
-const double GAMMA=0.0;
-const double DELTA=0.0;
+const double ALPHA=0.5;
+const double BETA=0.8;
+const double GAMMA=0.7;
+const double DELTA=0.6;
 
 //color ANSI code for terminal printing
 const string RESET = "\033[0m";//white color 

@@ -42,6 +42,7 @@ class Graph
 private:
     unordered_map<string, NodeData> NodeMap;
     unordered_map<string, vector<AdjListNode>> AdjList;
+    vector<vector<double>> domainComplimentarity;
 
     void loadEdgesData() // call loadNodesData() first
     {
@@ -122,6 +123,10 @@ public:
     {
         loadNodesData(); // calling loadNodesData() first as loadEdgesData() uses NodeMap which is filled by loadNodesData()
         loadEdgesData();
+        domainComplimentarity.push_back({0.6,0.2,0.5,0.55});
+        domainComplimentarity.push_back({0.1,0.5,0.3,0.45});
+        domainComplimentarity.push_back({0.55,0.1,0.45,0.35});
+        domainComplimentarity.push_back({0.6,0.4,0.45,0.65});
     }
 
     void DFS_detectCommunities(vector<string> &community, string node, unordered_map<string, bool> &visited)
@@ -379,5 +384,33 @@ public:
             recommedate << recommedation[i].second << "," << NodeMap[recommedation[i].second].domain << "," << NodeMap[recommedation[i].second].strength << "," << NodeMap[recommedation[i].second].normalized_bc << "," << recommedation[i].first << '\n';
         }
         recommedate.close();//closing file pointer
+    }
+
+    pair<string,string> GlobalBridgeScore()
+    {
+        pair<string,string> bridgerecommed={"_","_"};
+        double maxScore=0.0; 
+        for(auto &u:NodeMap)
+        {
+            for(auto &v:NodeMap)
+            {
+                if(u.first==v.first)
+                    continue;
+                int communityDifferentiator=(u.second.communityID==v.second.communityID)?0.0:1.0;//to help link only different communities;
+                double score=u.second.normalized_bc*v.second.normalized_bc*(domainComplimentarity[u.second.domain-1][v.second.domain-1])*((u.second.strength+v.second.strength)/20.0)*communityDifferentiator;
+                if(score>maxScore)
+                {
+                    bridgerecommed.first=u.second.id;
+                    bridgerecommed.second=v.second.id;
+                }
+            }
+        }
+        return bridgerecommed;
+    }
+
+
+    void BridgeRecommedation()
+    {
+        
     }
 };

@@ -4,7 +4,7 @@ using namespace std;
 #include "CreateDataset.h"
 #include "Graph.h"
 
-const string filePath="Dataset\\facebook_combined(UG).txt";
+const string filePath="Dataset\\dataset.txt";
 
 int main()
 {
@@ -14,5 +14,5 @@ int main()
     sniegraph.detectCommunities();//detecting communities
     sniegraph.betweennessCentrality();//calculating betweenesscentrality
 
-    sniegraph.Recommedation("0");
+    sniegraph.Recommedation("34");
 }
