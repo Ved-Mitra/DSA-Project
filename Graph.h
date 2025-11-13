@@ -2,10 +2,11 @@
 
 #include <bits/stdc++.h>
 #include "Constant.h"
+using namespace std;
 
 struct NodeData
 {
-    std::string id;
+    string id;
     int domain;
     double strength;
 
@@ -15,7 +16,7 @@ struct NodeData
 
     NodeData() {}//if value is found i.e. node already exist but needs updating not necessary (as this condition would never be encountered) but for compilation reason added
 
-    NodeData(std::string _id, int _domain, double _strength)
+    NodeData(string _id, int _domain, double _strength)
     {
         id = _id;
         domain = _domain;
@@ -25,10 +26,10 @@ struct NodeData
 
 struct AdjListNode
 {
-    std::string adjacentNode;
+    string adjacentNode;
     int weight;
 
-    AdjListNode(std::string v, int wt)
+    AdjListNode(string v, int wt)
     {
         adjacentNode = v;
         weight = wt;
@@ -39,32 +40,32 @@ class Graph
 {
     // add detect communities
 private:
-    std::unordered_map<std::string, NodeData> NodeMap;
-    std::unordered_map<std::string, std::vector<AdjListNode>> AdjList;
-    std::vector<std::vector<double>> domainComplimentarity;
-    std::vector<std::vector<std::string>> communityArr;
+    unordered_map<string, NodeData> NodeMap;
+    unordered_map<string, vector<AdjListNode>> AdjList;
+    vector<vector<double>> domainComplimentarity;
+    vector<vector<string>> communityArr;
     int numberOfCommunity;
 
     void loadEdgesData() // call loadNodesData() first
     {
-        std::ifstream edgesData(EDGESFILEPATH);
+        ifstream edgesData(EDGESFILEPATH);
         long long int lineCnt = 0;
         if (edgesData.is_open())
         {
-            std::cout << CYAN << "Starting to Load Edges data" << RESET << '\n';
-            std::string line;
-            std::getline(edgesData, line); // for skipping header
-            while (std::getline(edgesData, line))
+            cout << CYAN << "Starting to Load Edges data" << RESET << '\n';
+            string line;
+            getline(edgesData, line); // for skipping header
+            while (getline(edgesData, line))
             {
-                std::stringstream ss(line);
-                std::string u, v, wt;
-                std::getline(ss, u, ',');
-                std::getline(ss, v, ',');
-                std::getline(ss, wt, ',');
+                stringstream ss(line);
+                string u, v, wt;
+                getline(ss, u, ',');
+                getline(ss, v, ',');
+                getline(ss, wt, ',');
                 lineCnt++;
                 if (u.empty() || v.empty() || wt.empty())
                 {
-                    std::cerr << RED << "Cannot read at line " << lineCnt << RESET << '\n';
+                    cerr << RED << "Cannot read at line " << lineCnt << RESET << '\n';
                     return;
                 }
                 if (NodeMap.find(u) == NodeMap.end() || NodeMap.find(v) == NodeMap.end())
@@ -72,50 +73,50 @@ private:
                     // only adding the nodes if both exist
                     continue;
                 }
-                int weight = std::stoi(wt);
+                int weight = stoi(wt);
                 AdjListNode newNode(v, weight);
                 AdjList[u].push_back(newNode);
             }
             edgesData.close(); // closing the file pointer to edges.csv
-            std::cout << GREEN << "Succesfully Loaded Edges" << RESET << '\n';
+            cout << GREEN << "Succesfully Loaded Edges" << RESET << '\n';
         }
         else
         {
-            std::cout << RED << "Loading Edges Failed" << RESET << std::endl;
+            cout << RED << "Loading Edges Failed" << RESET << endl;
         }
     }
 
     void loadNodesData()
     {
-        std::ifstream NodesData(NODESFILEPATH);
+        ifstream NodesData(NODESFILEPATH);
         long long int lineCnt = 0;
         if (NodesData.is_open())
         {
-            std::string line;
-            std::getline(NodesData, line); // skipping header
-            while (std::getline(NodesData, line))
+            string line;
+            getline(NodesData, line); // skipping header
+            while (getline(NodesData, line))
             {
-                std::stringstream ss(line);
-                std::string id, domain, strength;
-                std::getline(ss, id, ',');
-                std::getline(ss, domain, ',');
-                std::getline(ss, strength, ',');
+                stringstream ss(line);
+                string id, domain, strength;
+                getline(ss, id, ',');
+                getline(ss, domain, ',');
+                getline(ss, strength, ',');
                 lineCnt++;
                 if (id.empty() || domain.empty() || strength.empty())
                 {
-                    std::cerr << RED << "Cannot read at line " << lineCnt << RESET << '\n';
+                    cerr << RED << "Cannot read at line " << lineCnt << RESET << '\n';
                 }
-                int domain_int = std::stoi(domain);
-                double strength_double = std::stod(strength);
+                int domain_int = stoi(domain);
+                double strength_double = stod(strength);
                 NodeData newNode(id, domain_int, strength_double);
                 NodeMap[id] = newNode;
             }
             NodesData.close(); // closing the file pointer
-            std::cout << GREEN << "Successfully loaded Nodes data" << RESET << '\n';
+            cout << GREEN << "Successfully loaded Nodes data" << RESET << '\n';
         }
         else
         {
-            std::cout << RED << "Cannot load Nodes data" << '\n';
+            cout << RED << "Cannot load Nodes data" << '\n';
         }
     }
 
@@ -131,7 +132,7 @@ public:
         numberOfCommunity=0;
     }
 
-    void DFS_detectCommunities(std::vector<std::string> &community, std::string node, std::unordered_map<std::string, bool> &visited)
+    void DFS_detectCommunities(vector<string> &community, string node, unordered_map<string, bool> &visited)
     {
         visited[node] = true;
         community.push_back(node);
@@ -144,14 +145,14 @@ public:
 
     void detectCommunities()
     {
-        std::ofstream communities(COMMUNITIES);
+        ofstream communities(COMMUNITIES);
         if (!communities.is_open())
         {
-            std::cout << RED << "communities file cannot be opened" << RESET << std::endl;
+            cout << RED << "communities file cannot be opened" << RESET << endl;
             return;
         }
         communities << "ID" << "," << "communityID" << '\n'; // header for communities.csv
-        std::unordered_map<std::string, bool> visited;
+        unordered_map<string, bool> visited;
         for (auto &x : NodeMap)
         { // storing all id as false
             visited[x.first] = false;
@@ -161,7 +162,7 @@ public:
         {
             if (!x.second)
             {
-                std::vector<std::string> community;
+                vector<string> community;
                 DFS_detectCommunities(community, x.first, visited);
                 for (auto &x : community)
                 {
@@ -178,7 +179,7 @@ public:
         numberOfCommunity=communityId-1;
         //cout << communityId << endl;
         communities.close(); // just closing the file pointer
-        std::cout << GREEN << "Successfully identified Communities" << RESET << std::endl;
+        cout << GREEN << "Successfully identified Communities" << RESET << endl;
         // int rename_success = rename("communities.txt", "communities.csv"); // renaming the file from .txt to .csv
         // if (rename_success == 0)
         // {
@@ -193,8 +194,8 @@ public:
     void betweennessCentrality()
     {
         //USED BRANDES ALGORITHM
-        std::cout << CYAN << "Starting betweenness centrality process" << RESET << std::endl;
-        std::unordered_map<std::string, double> bc_scores;//to store raw score
+        cout << CYAN << "Starting betweenness centrality process" << RESET << endl;
+        unordered_map<string, double> bc_scores;//to store raw score
         for (auto const &x: NodeMap)
         {
             bc_scores[x.first] = 0.0;
@@ -203,10 +204,10 @@ public:
         int node_count = 0;
         for (auto const &x: NodeMap)//for every node
         {
-            std::stack<std::string> st; // Order of nodes for backpropagation i.e. departure time (TOPO SORT)
-            std::unordered_map<std::string, std::vector<std::string>> predecessors;
-            std::unordered_map<std::string, double> sigma; // Number of shortest paths from x.first
-            std::unordered_map<std::string, int> distance;//distance of each node from x.first
+            stack<string> st; // Order of nodes for backpropagation i.e. departure time (TOPO SORT)
+            unordered_map<string, vector<string>> predecessors;
+            unordered_map<string, double> sigma; // Number of shortest paths from x.first
+            unordered_map<string, int> distance;//distance of each node from x.first
 
             for (auto const &x : NodeMap)
             {
@@ -215,12 +216,12 @@ public:
             }
             distance[x.first] = 0;
             sigma[x.first] = 1.0;
-            std::queue<std::string> q;
+            queue<string> q;
             q.push(x.first);
 
             while (!q.empty())
             {
-                std::string node = q.front();
+                string node = q.front();
                 q.pop();
                 st.push(node); // Push into stack for topo sort type linear ordering
 
@@ -228,7 +229,7 @@ public:
                 {//here considering edges weight to be 1
                     for (auto &neighbor : AdjList[node])
                     {
-                        std::string w = neighbor.adjacentNode;
+                        string w = neighbor.adjacentNode;
                         if (distance[w] < 0)///newNode
                         {
                             distance[w] = distance[node] + 1;
@@ -243,17 +244,17 @@ public:
                 }
             }
 
-            std::unordered_map<std::string, double> dependency;//calculate credit
+            unordered_map<string, double> dependency;//calculate credit
             for (auto const &x: NodeMap)
             {
                 dependency[x.first] = 0.0;
             }
             while (!st.empty())//in backpropagation order
             {
-                std::string w = st.top();
+                string w = st.top();
                 st.pop();
 
-                for (const std::string &v : predecessors[w])
+                for (const string &v : predecessors[w])
                 {
                     double credit = (sigma[v] / sigma[w]) * (1.0 + dependency[w]);//calculating credit for v
                     dependency[v] += credit;
@@ -266,11 +267,11 @@ public:
             node_count++;
             if (node_count % 1000 == 0)
             {
-                std::cout << YELLOW << "Processed " << node_count << "/" << NodeMap.size() <<  RESET << std::endl;
+                cout << YELLOW << "Processed " << node_count << "/" << NodeMap.size() <<  RESET << endl;
             }
         }
 
-        std::cout << CYAN << "Raw BC scores computed. NOW Normalizing" << RESET << std::endl;
+        cout << CYAN << "Raw BC scores computed. NOW Normalizing" << RESET << endl;
 
         //Normalizing the betweenness centrality score to ontain between 0.0 - 1.0
         double max_bc = 0.0;
@@ -285,10 +286,10 @@ public:
             }
         }
 
-        std::ofstream centrality_file(BETWEENNESS_CENTRALITY);//saving the score
+        ofstream centrality_file(BETWEENNESS_CENTRALITY);//saving the score
         if (!centrality_file.is_open())
         {
-            std::cout << RED << "Could not open " << BETWEENNESS_CENTRALITY << RESET << std::endl;
+            cout << RED << "Could not open " << BETWEENNESS_CENTRALITY << RESET << endl;
             return;
         }
         centrality_file << "ID,normalized_bc\n"; //header for the .csv file
@@ -297,7 +298,7 @@ public:
             if (max_bc > 0)
             {
                 double normalized_score = x.second / max_bc;
-                centrality_file << x.first << "," << std::fixed << std::setprecision(8) << normalized_score << "\n";
+                centrality_file << x.first << "," << fixed << setprecision(8) << normalized_score << "\n";
 
                 //storing the normalized_bc score for each node
                 NodeMap[x.first].normalized_bc=normalized_score;
@@ -309,21 +310,21 @@ public:
             }
         }
         centrality_file.close();//closing the file pointer
-        std::cout << GREEN << "Successfully computed and saved Betweenness Centrality." << RESET << std::endl;
+        cout << GREEN << "Successfully computed and saved Betweenness Centrality." << RESET << endl;
     }
 
-    std::unordered_map<std::string,double> DijsktraAlgorithm(std::string startNode)
+    unordered_map<string,double> DijsktraAlgorithm(string startNode)
     {
         //running Dijsktra using priority_queue
-        std::priority_queue<std::pair<double,std::string>,std::vector<std::pair<double,std::string>>,std::greater<std::pair<double,std::string>>> pq;
-        std::unordered_map<std::string,double> dist;
+        priority_queue<pair<double,string>,vector<pair<double,string>>,greater<pair<double,string>>> pq;
+        unordered_map<string,double> dist;
         for(auto &x:NodeMap)
             dist[x.first]=(double)INT_MAX;
         dist[startNode]=0.0;
         pq.push({0.0,startNode});
         while(!pq.empty())
         {
-            std::string node=pq.top().second;
+            string node=pq.top().second;
             double dNode=pq.top().first;
             pq.pop();
             for(auto &x:AdjList[node])
@@ -341,17 +342,17 @@ public:
         return dist;
     }
 
-    void Recommedation(std::string startNode)
+    void Recommedation(string startNode)
     {
         if(NodeMap.find(startNode)==NodeMap.end())
         {
-            std::cout << RED << "No node with this id" << RESET << std::endl;
+            cout << RED << "No node with this id" << RESET << endl;
             return;
         }
-        std::unordered_map<std::string,double> effectiveDistance=DijsktraAlgorithm(startNode);
+        unordered_map<string,double> effectiveDistance=DijsktraAlgorithm(startNode);
         
-        std::cout << CYAN << "Starting recommedation Engine " << RESET << std::endl;
-        std::vector<std::pair<double,std::string>> recommedation;
+        cout << CYAN << "Starting recommedation Engine " << RESET << endl;
+        vector<pair<double,string>> recommedation;
         NodeData targetUser=NodeMap[startNode];
         for(auto &x:NodeMap)
         {
@@ -369,23 +370,23 @@ public:
             recommedation.push_back({score,x.second.id});
         }
 
-        std::sort(recommedation.begin(),recommedation.end(),std::greater<std::pair<double,std::string>>());
-        std::ofstream recommedate(RECOMMEDATION);
+        sort(recommedation.begin(),recommedation.end(),greater<pair<double,string>>());
+        ofstream recommedate(RECOMMEDATION);
         if(!recommedate.is_open())
         {
-            std::cout << RED << "Cannot write in recommedation.csv" << RESET << std::endl;
+            cout << RED << "Cannot write in recommedation.csv" << RESET << endl;
         }
 
-        std::cout << GREEN << "Recommadation generated successfully" << RESET << std::endl;
+        cout << GREEN << "Recommadation generated successfully" << RESET << endl;
 
-        std::cout << CYAN << "Top 5 Recommedation for " << startNode << " are:" << std::endl;
-        std::cout << YELLOW << "ID   Domain   Strength   BC_Score   Final Score" << RESET << std::endl;
+        cout << CYAN << "Top 5 Recommedation for " << startNode << " are:" << endl;
+        cout << YELLOW << "ID   Domain   Strength   BC_Score   Final Score" << RESET << endl;
         recommedate << "ID,Domain,Strength,Betweenness,Final Score" << '\n';
 
         int cnt=0;//to track the number of recommedations given
         for(int i=0;cnt<5 && i<recommedation.size();i++)//printing top 5 recommedation
         {
-            std::string ID=recommedation[i].second;
+            string ID=recommedation[i].second;
             bool already_connected=false;
             for(auto &x:AdjList[startNode])
             {
@@ -400,7 +401,7 @@ public:
                 continue;
 
             //printing
-            std::cout << recommedation[i].second << '\t' << NodeMap[recommedation[i].second].domain << '\t' << NodeMap[recommedation[i].second].strength << '\t' << NodeMap[recommedation[i].second].normalized_bc << '\t' << recommedation[i].first << '\n';
+            cout << recommedation[i].second << '\t' << NodeMap[recommedation[i].second].domain << '\t' << NodeMap[recommedation[i].second].strength << '\t' << NodeMap[recommedation[i].second].normalized_bc << '\t' << recommedation[i].first << '\n';
             //writing in recommedation.csv
             recommedate << recommedation[i].second << "," << NodeMap[recommedation[i].second].domain << "," << NodeMap[recommedation[i].second].strength << "," << NodeMap[recommedation[i].second].normalized_bc << "," << recommedation[i].first << '\n';
             cnt++;
@@ -408,10 +409,10 @@ public:
         recommedate.close();//closing file pointer
     }
 
-    std::pair<std::string,std::string> GlobalBridgeRecommedation(int community1,int community2)
+    pair<string,string> GlobalBridgeRecommedation(int community1,int community2)
     {
         //to get the nodes with max Global recommedation score in among the communities 
-        std::pair<std::string,std::string> bridgerecommed={"_","_"};
+        pair<string,string> bridgerecommed={"_","_"};
         double maxScore=0.0; 
         for(auto &u:communityArr[community1])
         {
@@ -433,23 +434,23 @@ public:
         return bridgerecommed;
     }
 
-    void BridgeRecommedation(std::string startNode)
+    void BridgeRecommedation(string startNode)
     {
         if(NodeMap.find(startNode)==NodeMap.end())
         {
-            std::cout << RED << "Node don't exist" << RESET << std::endl;
+            cout << RED << "Node don't exist" << RESET << endl;
             return;
         }
 
         NodeData targetUser=NodeMap[startNode];
-        std::cout << CYAN << "Starting Bridge Recommedation Engine for " << startNode << "(Community: " << targetUser.communityID << ")" << std::endl;
+        cout << CYAN << "Starting Bridge Recommedation Engine for " << startNode << "(Community: " << targetUser.communityID << ")" << endl;
 
         //transversing by community
-        std::vector<std::pair<double,std::string>> bridgeRecommedate(3);//store the highest score for bridge connection by from a community from the startNode community
+        vector<pair<double,string>> bridgeRecommedate(3);//store the highest score for bridge connection by from a community from the startNode community
         double TopScoreOfCommunity=0.0;
         int TopCommunity=0;
 
-        std::unordered_map<std::string,double> dist_startNode_community=DijsktraAlgorithm(startNode);//to store shortest path from startNode in startNode's community
+        unordered_map<string,double> dist_startNode_community=DijsktraAlgorithm(startNode);//to store shortest path from startNode in startNode's community
 
         for(int i=0;i<numberOfCommunity;i++)
         {
@@ -457,16 +458,16 @@ public:
                 continue;
 
             //community1 node , community2 node
-            std::pair<std::string,std::string> globalBridge=GlobalBridgeRecommedation(targetUser.communityID-1,i);
+            pair<string,string> globalBridge=GlobalBridgeRecommedation(targetUser.communityID-1,i);
             //these nodes in globalBridge would act as connecting nodes for the two community and we would then direct a path from them from one communtiy to another to recommend bridge connections between communities
             if(globalBridge.first=="_" || globalBridge.second=="_")
                 continue;
             
-            std::vector<std::pair<double,std::string>> bridgeRecommedationCommunity;//to store the score for current Bridge recommedation of cummonity
+            vector<pair<double,string>> bridgeRecommedationCommunity;//to store the score for current Bridge recommedation of cummonity
 
             for(auto &x:communityArr[i])
             {
-                std::unordered_map<std::string,double> dist_ith_community_from_Global_Bridge_Recommedation=DijsktraAlgorithm(globalBridge.second);//to store distance of all nodes from global recommedated node in second community
+                unordered_map<string,double> dist_ith_community_from_Global_Bridge_Recommedation=DijsktraAlgorithm(globalBridge.second);//to store distance of all nodes from global recommedated node in second community
 
                 double domainSimilarity=(targetUser.domain==NodeMap[x].domain)?0.0:1.0;
                 double total_distance=dist_startNode_community[globalBridge.first] + 1 + dist_ith_community_from_Global_Bridge_Recommedation[x];//sum of distance from startNode to global bridge recommedation node + 1 + distance from global node recommedation in 2nd community to x node
@@ -481,7 +482,7 @@ public:
             }
 
             //sorting bridge recommedation for this community
-            std::sort(bridgeRecommedationCommunity.begin(),bridgeRecommedationCommunity.end(),std::greater<std::pair<double,std::string>>());
+            sort(bridgeRecommedationCommunity.begin(),bridgeRecommedationCommunity.end(),greater<pair<double,string>>());
 
             double topScore_in_ith_Community=0.0;
             for(int j=0;j<3;j++)
@@ -502,23 +503,143 @@ public:
                 TopCommunity=i+1;//as communityID is 1-indexed based
             }            
         }
-        std::cout << GREEN << "Successfully completed Bridge Recommedation" << RESET << std::endl;
+        cout << GREEN << "Successfully completed Bridge Recommedation" << RESET << endl;
 
-        std::ofstream BridgeRecommedationFile(BRIDGE_RECOMMEDATION);
+        ofstream BridgeRecommedationFile(BRIDGE_RECOMMEDATION);
         if(!BridgeRecommedationFile.is_open())
         {
-            std::cout << RED << "Cannot write Bridge Recommedation " << RESET << std::endl;
+            cout << RED << "Cannot write Bridge Recommedation " << RESET << endl;
         }
-        std::cout << YELLOW << "Top 3 Bridge Recommedation from " << startNode << "of community " << targetUser.communityID << " to community " << TopCommunity << RESET << std::endl;
+        cout << YELLOW << "Top 3 Bridge Recommedation from " << startNode << "of community " << targetUser.communityID << " to community " << TopCommunity << RESET << endl;
         BridgeRecommedationFile << "ID,Domain,Strength,Betweenness,Final Score\n";
-        std::cout << "ID\tDomain\tStrength\tBetweenness\tCommunityID\tFinal Score" << std::endl;
+        cout << "ID\tDomain\tStrength\tBetweenness\tCommunityID\tFinal Score" << endl;
         for(int i=0;i<3;i++)
         {
             //writing recommedation in file .csv
             BridgeRecommedationFile << bridgeRecommedate[i].second << "," << NodeMap[bridgeRecommedate[i].second].domain << "," << NodeMap[bridgeRecommedate[i].second].strength << "," << NodeMap[bridgeRecommedate[i].second].normalized_bc << "," << bridgeRecommedate[i].first << '\n';
             //printing bridge recommedation
-            std::cout << bridgeRecommedate[i].second << "\t" << NodeMap[bridgeRecommedate[i].second].domain << "\t" << NodeMap[bridgeRecommedate[i].second].strength << "\t" << NodeMap[bridgeRecommedate[i].second].normalized_bc << "\t" << TopCommunity << "\t" << bridgeRecommedate[i].first << '\n';
+            cout << bridgeRecommedate[i].second << "\t" << NodeMap[bridgeRecommedate[i].second].domain << "\t" << NodeMap[bridgeRecommedate[i].second].strength << "\t" << NodeMap[bridgeRecommedate[i].second].normalized_bc << "\t" << TopCommunity << "\t" << bridgeRecommedate[i].first << '\n';
         }
         BridgeRecommedationFile.close();//closing the file pointer
+
+
+        //for computing 
+        pair<string,string> bridge=GlobalBridgeRecommedation(targetUser.communityID-1,TopCommunity-1);
+        CompareCost(bridge);
     }
+
+    // Network Optimisation Proof
+    // FUNCTION 1 : To Calculate the total info spreading cost
+    double CostCalculation(string startNode)
+    {
+        if (NodeMap.find(startNode) == NodeMap.end())
+        {
+            cout << RED << "Invalid start node ID: " << startNode << RESET << endl;
+            return -1;
+        }
+// Total Cost function to track the total cost being spent
+        double totalCost = 0.0;
+// Roundcount to keep the count of the rounds being required to spread the info
+        int roundCount = 0;
+// informed set to keep the track of the nodes already aware of the info
+        unordered_set<string> informed;
+// newly_informed set to keep the track of the nodes just aware of the info in the last round
+        unordered_set<string> newly_informed;
+
+        informed.insert(startNode);
+        newly_informed.insert(startNode);
+
+        while (!newly_informed.empty())
+        {
+// nextRound set to store the nodes who will be conveyed the info in the next round
+            unordered_set<string> nextRound;
+            roundCount++;
+
+            for (const string &u : newly_informed)
+            {
+                for (auto &neigh : AdjList[u])
+                {
+                    string v = neigh.adjacentNode;
+                    int wt = neigh.weight;
+
+                    if (informed.find(v) == informed.end())
+                    {
+                        double cost = BASE_COST / (double)wt; 
+                        totalCost += cost;
+// both nextRound and informed being updated
+                        nextRound.insert(v);
+                        informed.insert(v);
+                    }
+                }
+            }
+// deleting the previously store nodes of newly_informed
+            newly_informed = nextRound;
+        }
+
+        cout << GREEN << "Information reached " << informed.size() << " / "
+            << NodeMap.size() << " nodes in " << roundCount << " rounds." << RESET << endl;
+
+        cout << YELLOW << "Total cost of information spread from " << startNode
+            << " = " << fixed << setprecision(6) << totalCost << RESET << endl;
+
+        return totalCost;
+    }
+
+    // FUNCTION 2️ : CompareCost
+    void CompareCost(pair<string, string> bridge)
+    {
+        string u = bridge.first;
+        string v = bridge.second;
+
+        if (NodeMap.find(u) == NodeMap.end() || NodeMap.find(v) == NodeMap.end())
+        {
+            cout << RED << "Invalid bridge nodes provided." << RESET << endl;
+            return;
+        }
+
+        cout << CYAN << "=== Comparing Information Spread Cost Before and After Bridging ===" << RESET << endl;
+        cout << "Bridge: (" << u << ", " << v << ")" << endl;
+
+        // Cost before adding bridge
+        double costBeforeU= DEPLOY_COST+CostCalculation(u);
+        double costBeforeV= DEPLOY_COST+CostCalculation(v);
+        double totalCostBefore = costBeforeU + costBeforeV;
+
+        // Add temporary bridge
+        AdjList[u].push_back(AdjListNode(v, 1)); // neutral weight = 1
+        AdjList[v].push_back(AdjListNode(u, 1));
+
+        // Cost after adding bridge
+        double costAfterU= DEPLOY_COST+CostCalculation(u);
+        double totalCostAfter= costAfterU;
+
+        // Restore original graph (remove temporary bridge)
+        AdjList[u].pop_back();
+        AdjList[v].pop_back();
+
+        // Compute improvement %
+        double improvement = ((totalCostBefore - totalCostAfter) / totalCostBefore) * 100.0;
+
+        cout << CYAN << "=== COST COMPARISON RESULTS ===" << RESET << endl;
+        cout << "Before Bridging : " << YELLOW << fixed << setprecision(6) << totalCostBefore << RESET << endl;
+        cout << "After Bridging  : " << GREEN << fixed << setprecision(6) << totalCostAfter << RESET << endl;
+        cout << "Improvement     : " << fixed << setprecision(2)
+            << improvement << "% reduction in total cost" << endl;
+
+        // Save results (append mode)
+        ofstream resultsFile("InformationCostComparison.csv", ios::app);
+        resultsFile << "u,v,Total Cost Before,Total Cost after,Improvement" << '\n';
+        if (resultsFile.is_open())
+        {
+            resultsFile << u << "," << v << ","
+                        << fixed << setprecision(6)
+                        << totalCostBefore << "," << totalCostAfter << ","
+                        << improvement << "\n";
+            resultsFile.close();
+        }
+        else
+        {
+            cout << RED << "Could not write results to InformationCostComparison.csv" << RESET << endl;
+        }
+    } 
 };
