@@ -127,7 +127,7 @@ class SNIEAnimation(Scene):
         # =====================================================
         # SCENE 2 — DASHED EDGES
         # =====================================================
-        title2 = Text("SNIE — Phase 2: Suggested Bridges", font_size=36).to_edge(UP)
+        title2 = Text("SNIE — Phase 2: Suggested recommendation", font_size=36).to_edge(UP)
         self.play(Transform(title1, title2))
 
         dashed_edges = []
@@ -150,7 +150,7 @@ class SNIEAnimation(Scene):
         # =====================================================
         # SCENE 3 — SOLID BRIDGES
         # =====================================================
-        title3 = Text("SNIE — Phase 3: Final Network After Bridges", font_size=36).to_edge(UP)
+        title3 = Text("SNIE — Phase 3: Final Network After recommendation", font_size=36).to_edge(UP)
         self.play(Transform(title1, title3))
 
         solid_edges = []
