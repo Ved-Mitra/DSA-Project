@@ -1,7 +1,7 @@
 #pragma once //this line tells the compiler to only inlcude this file once
 
 #include <bits/stdc++.h>
-#include "Constanst.h"
+#include "Constant.h"
 using namespace std;
 
 //this code creates edge.csv ({U,V,Weight})
@@ -24,8 +24,7 @@ class CreateData
     void createEdgesCSV(const string filePath)
     {
         ifstream data(filePath);
-        const string edgesPath="Dataset\\edges.txt";
-        ofstream edges(edgesPath);
+        ofstream edges(EDGESFILEPATH);
         string line;//to store line by line from data filePath
         //here we have not used rand() and seed(), the old way in c because the rand() has predictive patterns
         random_device rd;//seeding random number
@@ -65,11 +64,11 @@ class CreateData
             data.close();
             cout << GREEN  <<  "Succesfully wrote the edges.txt file" << RESET << endl;
             //renaming edges.txt to edges.csv for better readability
-            int success=rename("Dataset\\edges.txt","Dataset\\edges.csv");
-            if(success==0)
-                cout << GREEN << "Succesfully renamed edges.txt to edges.csv" <<  RESET << endl;
-            else
-                cout << RED << "Renaming Failed" <<  RESET << endl;
+        //     int success=rename("Dataset\\edges.txt","Dataset\\edges.csv");
+        //     if(success==0)
+        //         cout << GREEN << "Succesfully renamed edges.txt to edges.csv" <<  RESET << endl;
+        //     else
+        //         cout << RED << "Renaming Failed" <<  RESET << endl;
         }
         else
             cout << RED << filePath << " not opened" << RESET << endl;
@@ -108,7 +107,7 @@ class CreateData
 
     void createNodesCSV(const string filePath)
     {
-        ofstream nodes("Dataset\\nodes.txt");
+        ofstream nodes(NODESFILEPATH);
         string line;//to store line by line from data filePath
         //here we have not used rand() and seed(), the old way in c because the rand() has predictive patterns
         random_device rd;//seeding random number
@@ -143,11 +142,11 @@ class CreateData
             nodes.close();
             cout <<  GREEN << "Succesfully wrote the nodes.txt file" << RESET << endl;
             //renaming edges.txt to edges.csv for better readability
-            int success=rename("Dataset\\nodes.txt","Dataset\\nodes.csv");
-            if(success==0)
-                cout << GREEN << "Succesfully renamed nodes.txt to nodes.csv" << RESET << endl;
-            else
-                cout << RED << "Renaming Failed" << RESET << endl;
+        //     int success=rename("Dataset\\nodes.txt","Dataset\\nodes.csv");
+        //     if(success==0)
+        //         cout << GREEN << "Succesfully renamed nodes.txt to nodes.csv" << RESET << endl;
+        //     else
+        //         cout << RED << "Renaming Failed" << RESET << endl;
         }
         else
             cout << RED << "Dataset/nodes.txt cannot be" << " not opened" << RESET << endl;
