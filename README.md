@@ -97,7 +97,7 @@ then verify that ffmpeg is installed
 ```bash
 ffmpeg -version
 ```
-4.. Git clone
+4. Git clone
 ``` Bash
 git clone https://github.com/Ved-Mitra/DSA-Project.git
 ```
@@ -112,3 +112,4 @@ python animation.py
 manim -pql animation.py SNIEAnimation
 
 ```
+
