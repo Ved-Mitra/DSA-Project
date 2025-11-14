@@ -10,7 +10,7 @@ class SNIEAnimation(Scene):
         nodes_df = pd.read_csv("Dataset/nodes.csv")
         edges_df = pd.read_csv("Dataset/edges.csv")
         rec_df   = pd.read_csv("recommedation.csv")
-        comm_df  = pd.read_csv("Dataset/communities.csv")
+        comm_df  = pd.read_csv("communities.csv")
 
 
         nodes_df["id"] = nodes_df["id"].astype(str)
