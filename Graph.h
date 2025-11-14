@@ -14,7 +14,7 @@
 #include <functional>     // std::greater (comparator)
 #include <utility>        // std::pair
 #include <iomanip>        // std::fixed, std::setprecision
-#include <climits>        // INT_MAX
+#include <climits>// INT_MAX
 #include "Constant.h"
 
 struct NodeData
