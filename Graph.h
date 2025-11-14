@@ -645,4 +645,20 @@ public:
             std::cout << RED << "Could not write results to InformationCostComparison.csv" << RESET << std::endl;
         }
     }
+   void InfluentialNodes_in_eachCommunity()
+    {
+        cout << CYAN << "Outputting Influtential Nodes in each Community" << RESET << endl;
+        for(int i=0;i<communityArr.size();i++)
+        {
+            if(communityArr[i].size()==0)
+                continue;
+            std::string InfluentialNode=communityArr[i][0];
+            for(int j=1;j<communityArr[i].size();j++)
+            {
+                if(AdjList[InfluentialNode].size()<AdjList[communityArr[i][j]].size())
+                    InfluentialNode=communityArr[i][j];
+            }
+            cout << InfluentialNode << " is the most influential node in " << i+1 << " community" << endl;
+        }
+    }
 };
