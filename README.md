@@ -90,16 +90,25 @@ pip install networkx pandas numpy
 ``` Bash
 pip install manim
 ```
-3. Git clone
+3. Install ffmpeg
+install ffmpeg from https://www.gyan.dev/ffmpeg/builds/
+then paste the bin path of ffmpeg in system environmental variables
+then verify that ffmpeg is installed
+```bash
+ffmpeg -version
+```
+4.. Git clone
 ``` Bash
 git clone https://github.com/Ved-Mitra/DSA-Project.git
 ```
-4. Exceute
+
+5. Exceute
 ```Bash
 g++ main.cpp -o snie
 ```
-5. Execute Animation
+6. Execute Animation
 ```Bash
 python animation.py
 manim -pql animation.py SNIEAnimation
+
 ```
