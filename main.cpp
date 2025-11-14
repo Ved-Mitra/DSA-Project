@@ -12,8 +12,14 @@ int main()
 
     Graph sniegraph;
     sniegraph.detectCommunities();//detecting communities
+    cout << "\n";
+    cout << "\n";
     sniegraph.betweennessCentrality();//calculating betweenesscentrality
+    cout << "\n";
+    cout << "\n";
 
     sniegraph.Recommedation("34");
+    cout << "\n";
+    cout << "\n";
     sniegraph.BridgeRecommedation("40");
 }
