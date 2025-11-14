@@ -78,7 +78,7 @@ GlobalScore=BCA(i)×BCB(j)×DomainComplementarity×StrengthBalance
 4. numpy
 5. pandas
 6. Mingw-32bit
-
+7. ffmpeg
 
 # Installation
 
@@ -112,4 +112,5 @@ python animation.py
 manim -pql animation.py SNIEAnimation
 
 ```
+
 
