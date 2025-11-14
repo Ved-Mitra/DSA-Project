@@ -22,4 +22,5 @@ int main()
     cout << "\n";
     cout << "\n";
     sniegraph.BridgeRecommedation("40");
+    sniegraph.InfluentialNodes_in_eachCommunity();
 }
