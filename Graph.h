@@ -1,6 +1,20 @@
 #pragma once // this line tells the compiler to only inlcude this file once
 
-#include <bits/stdc++.h>
+// #include <bits/stdc++.h>
+#include <iostream>       // std::cout, std::cerr, std::endl
+#include <fstream>        // std::ifstream, std::ofstream
+#include <sstream>        // std::stringstream, std::getline(stream, string)
+#include <string>         // std::string, std::stoi, std::stod
+#include <vector>         // std::vector
+#include <unordered_map>  // std::unordered_map
+#include <unordered_set>  // std::unordered_set
+#include <queue>          // std::queue, std::priority_queue
+#include <stack>          // std::stack
+#include <algorithm>      // std::sort, std::greater
+#include <functional>     // std::greater (comparator)
+#include <utility>        // std::pair
+#include <iomanip>        // std::fixed, std::setprecision
+#include <climits>        // INT_MAX
 #include "Constant.h"
 
 struct NodeData
