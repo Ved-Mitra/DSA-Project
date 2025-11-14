@@ -1,6 +1,13 @@
 #pragma once //this line tells the compiler to only inlcude this file once
 
-#include <bits/stdc++.h>
+//#include <bits/stdc++.h>
+#include <iostream>     // cout, endl
+#include <fstream>      // ifstream, ofstream
+#include <sstream>      // stringstream
+#include <string>       // std::string
+#include <set>          // std::set
+#include <random>       // random_device, mt19937, distributions
+#include <iomanip>      // std::fixed, std::setprecision
 #include "Constant.h"
 
 
