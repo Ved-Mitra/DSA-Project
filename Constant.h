@@ -1,6 +1,7 @@
 #pragma once
 
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
 
 // File paths
 const std::string EDGESFILEPATH= "Dataset/edges.csv";

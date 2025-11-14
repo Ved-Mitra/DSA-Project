@@ -357,277 +357,278 @@ public:
     }
 
     // Recommedation and BridgeRecommedation functions come after this
-void Recommedation(std::string startNode)
-{
-    if(NodeMap.find(startNode)==NodeMap.end())
+    void Recommedation(std::string startNode)
     {
-        std::cout << RED << "No node with this id" << RESET << std::endl;
-        return;
-    }
-    std::unordered_map<std::string,double> effectiveDistance=DijsktraAlgorithm(startNode);
-    
-    std::cout << CYAN << "Starting recommedation Engine " << RESET << std::endl;
-    std::vector<std::pair<double,std::string>> recommedation;
-    NodeData targetUser=NodeMap[startNode];
-    for(auto &x:NodeMap)
-    {
-        if(x.second.id==targetUser.id)
-            continue;
-        
-        int domainSimilarity=(x.second.domain==targetUser.domain)?1:0;
-        double distance=(effectiveDistance[x.second.id]==(double)INT_MAX)?0.0:effectiveDistance[x.second.id];
-        double proximity=1.0/(1.0+distance);
-        double strengthFactor=(targetUser.strength+x.second.strength)/20.0; //dividing by 2 to get average to avoid a high skill person to connect to low skill person and dividing by 10 to normalize the strengthFactor
-        double bc_score=x.second.normalized_bc;//normalized betweenness centrality score
-        
-        //calculating recommedation score
-        double score= ALPHA*domainSimilarity + BETA*proximity + GAMMA*strengthFactor + DELTA*bc_score;
-        recommedation.push_back({score,x.second.id});
-    }
-
-    std::sort(recommedation.begin(),recommedation.end(),std::greater<std::pair<double,std::string>>());
-    std::ofstream recommedate(RECOMMEDATION);
-    if(!recommedate.is_open())
-    {
-        std::cout << RED << "Cannot write in recommedation.csv" << RESET << std::endl;
-    }
-
-    std::cout << GREEN << "Recommadation generated successfully" << RESET << std::endl;
-
-    std::cout << CYAN << "Top 5 Recommedation for " << startNode << " are:" << std::endl;
-    std::cout << YELLOW << "ID   Domain   Strength   BC_Score   Final Score" << RESET << std::endl;
-    recommedate << "ID,Domain,Strength,Betweenness,Final Score" << '\n';
-
-    int cnt=0;//to track the number of recommedations given
-    for(int i=0;cnt<5 && i<recommedation.size();i++)//printing top 5 recommedation
-    {
-        std::string ID=recommedation[i].second;
-        bool already_connected=false;
-        for(auto &x:AdjList[startNode])
+        if(NodeMap.find(startNode)==NodeMap.end())
         {
-            //to avoid recommedation to adjacent nodes
-            if(ID==x.adjacentNode)
+            std::cout << RED << "No node with this id" << RESET << std::endl;
+            return;
+        }
+        std::unordered_map<std::string,double> effectiveDistance=DijsktraAlgorithm(startNode);
+        
+        std::cout << CYAN << "Starting recommedation Engine " << RESET << std::endl;
+        std::vector<std::pair<double,std::string>> recommedation;
+        NodeData targetUser=NodeMap[startNode];
+        for(auto &x:NodeMap)
+        {
+            if(x.second.id==targetUser.id)
+                continue;
+            
+            int domainSimilarity=(x.second.domain==targetUser.domain)?1:0;
+            double distance=(effectiveDistance[x.second.id]==(double)INT_MAX)?0.0:effectiveDistance[x.second.id];
+            double proximity=1.0/(1.0+distance);
+            double strengthFactor=(targetUser.strength+x.second.strength)/20.0; //dividing by 2 to get average to avoid a high skill person to connect to low skill person and dividing by 10 to normalize the strengthFactor
+            double bc_score=x.second.normalized_bc;//normalized betweenness centrality score
+            
+            //calculating recommedation score
+            double score= ALPHA*domainSimilarity + BETA*proximity + GAMMA*strengthFactor + DELTA*bc_score;
+            recommedation.push_back({score,x.second.id});
+        }
+
+        std::sort(recommedation.begin(),recommedation.end(),std::greater<std::pair<double,std::string>>());
+        std::ofstream recommedate(RECOMMEDATION);
+        if(!recommedate.is_open())
+        {
+            std::cout << RED << "Cannot write in recommedation.csv" << RESET << std::endl;
+        }
+
+        std::cout << GREEN << "Recommadation generated successfully" << RESET << std::endl;
+
+        std::cout << CYAN << "Top 5 Recommedation for " << startNode << " are:" << std::endl;
+        std::cout << YELLOW << "ID   Domain   Strength   BC_Score   Final Score" << RESET << std::endl;
+        recommedate << "ID,Domain,Strength,Betweenness,Final Score" << '\n';
+
+        int cnt=0;//to track the number of recommedations given
+        for(int i=0;cnt<5 && i<recommedation.size();i++)//printing top 5 recommedation
+        {
+            std::string ID=recommedation[i].second;
+            bool already_connected=false;
+            for(auto &x:AdjList[startNode])
             {
-                already_connected=true;
-                break;
-            }                
+                //to avoid recommedation to adjacent nodes
+                if(ID==x.adjacentNode)
+                {
+                    already_connected=true;
+                    break;
+                }                
+            }
+            if(already_connected)
+                continue;
+
+            //printing
+            std::cout << recommedation[i].second << '\t' << NodeMap[recommedation[i].second].domain << '\t' << NodeMap[recommedation[i].second].strength << '\t' << NodeMap[recommedation[i].second].normalized_bc << '\t' << recommedation[i].first << '\n';
+            //writing in recommedation.csv
+            recommedate << recommedation[i].second << "," << NodeMap[recommedation[i].second].domain << "," << NodeMap[recommedation[i].second].strength << "," << NodeMap[recommedation[i].second].normalized_bc << "," << recommedation[i].first << '\n';
+            cnt++;
         }
-        if(already_connected)
-            continue;
-
-        //printing
-        std::cout << recommedation[i].second << '\t' << NodeMap[recommedation[i].second].domain << '\t' << NodeMap[recommedation[i].second].strength << '\t' << NodeMap[recommedation[i].second].normalized_bc << '\t' << recommedation[i].first << '\n';
-        //writing in recommedation.csv
-        recommedate << recommedation[i].second << "," << NodeMap[recommedation[i].second].domain << "," << NodeMap[recommedation[i].second].strength << "," << NodeMap[recommedation[i].second].normalized_bc << "," << recommedation[i].first << '\n';
-        cnt++;
-    }
-    recommedate.close();//closing file pointer
-}
-
-
-void BridgeRecommedation(std::string startNode)
-{
-    if(NodeMap.find(startNode)==NodeMap.end())
-    {
-        std::cout << RED << "Node don't exist" << RESET << std::endl;
-        return;
+        recommedate.close();//closing file pointer
     }
 
-    NodeData targetUser=NodeMap[startNode];
-    std::cout << CYAN << "Starting Bridge Recommedation Engine for " << startNode << "(Community: " << targetUser.communityID << ")" << std::endl;
 
-    //transversing by community
-    std::vector<std::pair<double,std::string>> bridgeRecommedate(3);//store the highest score for bridge connection by from a community from the startNode community
-    double TopScoreOfCommunity=0.0;
-    int TopCommunity=0;
-
-    std::unordered_map<std::string,double> dist_startNode_community=DijsktraAlgorithm(startNode);//to store shortest path from startNode in startNode's community
-
-    for(int i=0;i<numberOfCommunity;i++)
+    void BridgeRecommedation(std::string startNode)
     {
-        if(i==targetUser.communityID-1)
-            continue;
-
-        //community1 node , community2 node
-        std::pair<std::string,std::string> globalBridge=GlobalBridgeRecommedation(targetUser.communityID-1,i);
-        //these nodes in globalBridge would act as connecting nodes for the two community and we would then direct a path from them from one communtiy to another to recommend bridge connections between communities
-        if(globalBridge.first=="_" || globalBridge.second=="_")
-            continue;
-        
-        std::vector<std::pair<double,std::string>> bridgeRecommedationCommunity;//to store the score for current Bridge recommedation of cummonity
-
-        for(auto &x:communityArr[i])
+        if(NodeMap.find(startNode)==NodeMap.end())
         {
-            std::unordered_map<std::string,double> dist_ith_community_from_Global_Bridge_Recommedation=DijsktraAlgorithm(globalBridge.second);//to store distance of all nodes from global recommedated node in second community
-
-            double domainSimilarity=(targetUser.domain==NodeMap[x].domain)?0.0:1.0;
-            double total_distance=dist_startNode_community[globalBridge.first] + 1 + dist_ith_community_from_Global_Bridge_Recommedation[x];//sum of distance from startNode to global bridge recommedation node + 1 + distance from global node recommedation in 2nd community to x node
-            double proximity=1.0/(1.0+total_distance);
-            double strengthBalance=(targetUser.strength+NodeMap[x].strength)/20.0;//dividing by 20.0 to normalize strength(10.0) and also take average(2.0)
-            double normalized_BC_score=(NodeMap[targetUser.id].normalized_bc+NodeMap[x].normalized_bc)/2.0;//to take average of betweenness centrality
-
-            //calculating final score
-            double score=ALPHA*(1-domainSimilarity) + BETA*(proximity) + GAMMA*strengthBalance + DELTA*normalized_BC_score;
-
-            bridgeRecommedationCommunity.push_back({score,x});
+            std::cout << RED << "Node don't exist" << RESET << std::endl;
+            return;
         }
 
-        //sorting bridge recommedation for this community
-        std::sort(bridgeRecommedationCommunity.begin(),bridgeRecommedationCommunity.end(),std::greater<std::pair<double,std::string>>());
+        NodeData targetUser=NodeMap[startNode];
+        std::cout << CYAN << "Starting Bridge Recommedation Engine for " << startNode << "(Community: " << targetUser.communityID << ")" << std::endl;
 
-        double topScore_in_ith_Community=0.0;
-        for(int j=0;j<3;j++)
+        //transversing by community
+        std::vector<std::pair<double,std::string>> bridgeRecommedate(3);//store the highest score for bridge connection by from a community from the startNode community
+        double TopScoreOfCommunity=0.0;
+        int TopCommunity=0;
+
+        std::unordered_map<std::string,double> dist_startNode_community=DijsktraAlgorithm(startNode);//to store shortest path from startNode in startNode's community
+
+        for(int i=0;i<numberOfCommunity;i++)
         {
-            //taking top3 nodes score and taking average
-            topScore_in_ith_Community+=bridgeRecommedationCommunity[j].first;
-        }
-        
-        if(topScore_in_ith_Community>TopScoreOfCommunity)
-        {
-            //storing the community with top score
-            TopScoreOfCommunity=topScore_in_ith_Community;
+            if(i==targetUser.communityID-1)
+                continue;
+
+            //community1 node , community2 node
+            std::pair<std::string,std::string> globalBridge=GlobalBridgeRecommedation(targetUser.communityID-1,i);
+            //these nodes in globalBridge would act as connecting nodes for the two community and we would then direct a path from them from one communtiy to another to recommend bridge connections between communities
+            if(globalBridge.first=="_" || globalBridge.second=="_")
+                continue;
+            
+            std::vector<std::pair<double,std::string>> bridgeRecommedationCommunity;//to store the score for current Bridge recommedation of cummonity
+
+            for(auto &x:communityArr[i])
+            {
+                std::unordered_map<std::string,double> dist_ith_community_from_Global_Bridge_Recommedation=DijsktraAlgorithm(globalBridge.second);//to store distance of all nodes from global recommedated node in second community
+
+                double domainSimilarity=(targetUser.domain==NodeMap[x].domain)?0.0:1.0;
+                double total_distance=dist_startNode_community[globalBridge.first] + 1 + dist_ith_community_from_Global_Bridge_Recommedation[x];//sum of distance from startNode to global bridge recommedation node + 1 + distance from global node recommedation in 2nd community to x node
+                double proximity=1.0/(1.0+total_distance);
+                double strengthBalance=(targetUser.strength+NodeMap[x].strength)/20.0;//dividing by 20.0 to normalize strength(10.0) and also take average(2.0)
+                double normalized_BC_score=(NodeMap[targetUser.id].normalized_bc+NodeMap[x].normalized_bc)/2.0;//to take average of betweenness centrality
+
+                //calculating final score
+                double score=ALPHA*(1-domainSimilarity) + BETA*(proximity) + GAMMA*strengthBalance + DELTA*normalized_BC_score;
+
+                bridgeRecommedationCommunity.push_back({score,x});
+            }
+
+            //sorting bridge recommedation for this community
+            std::sort(bridgeRecommedationCommunity.begin(),bridgeRecommedationCommunity.end(),std::greater<std::pair<double,std::string>>());
+
+            double topScore_in_ith_Community=0.0;
             for(int j=0;j<3;j++)
             {
-                bridgeRecommedate[j].second=bridgeRecommedationCommunity[j].second;
-                bridgeRecommedate[j].first=bridgeRecommedationCommunity[j].first;
+                //taking top3 nodes score and taking average
+                topScore_in_ith_Community+=bridgeRecommedationCommunity[j].first;
             }
-            TopCommunity=i+1;//as communityID is 1-indexed based
-        }            
-    }
-    std::cout << GREEN << "Successfully completed Bridge Recommedation" << RESET << std::endl;
-
-    std::ofstream BridgeRecommedationFile(BRIDGE_RECOMMEDATION);
-    if(!BridgeRecommedationFile.is_open())
-    {
-        std::cout << RED << "Cannot write Bridge Recommedation " << RESET << std::endl;
-    }
-    std::cout << YELLOW << "Top 3 Bridge Recommedation from " << startNode << "of community " << targetUser.communityID << " to community " << TopCommunity << RESET << std::endl;
-    BridgeRecommedationFile << "ID,Domain,Strength,Betweenness,Final Score\n";
-    std::cout << "ID\tDomain\tStrength\tBetweenness\tCommunityID\tFinal Score" << std::endl;
-    for(int i=0;i<3;i++)
-    {
-        //writing recommedation in file .csv
-        BridgeRecommedationFile << bridgeRecommedate[i].second << "," << NodeMap[bridgeRecommedate[i].second].domain << "," << NodeMap[bridgeRecommedate[i].second].strength << "," << NodeMap[bridgeRecommedate[i].second].normalized_bc << "," << bridgeRecommedate[i].first << '\n';
-        //printing bridge recommedation
-        std::cout << bridgeRecommedate[i].second << "\t" << NodeMap[bridgeRecommedate[i].second].domain << "\t" << NodeMap[bridgeRecommedate[i].second].strength << "\t" << NodeMap[bridgeRecommedate[i].second].normalized_bc << "\t" << TopCommunity << "\t" << bridgeRecommedate[i].first << '\n';
-    }
-    BridgeRecommedationFile.close();//closing the file pointer
-
-    //for computing 
-    std::pair<std::string,std::string> bridge=GlobalBridgeRecommedation(targetUser.communityID-1,TopCommunity-1);
-    CompareCost(bridge);
-}
-
-
-double CostCalculation(std::string startNode)
-{
-    if (NodeMap.find(startNode) == NodeMap.end())
-    {
-        std::cout << RED << "Invalid start node ID: " << startNode << RESET << std::endl;
-        return -1;
-    }
-    // Total Cost function to track the total cost being spent
-    double totalCost = 0.0;
-    // Roundcount to keep the count of the rounds being required to spread the info
-    int roundCount = 0;
-    // informed set to keep the track of the nodes already aware of the info
-    std::unordered_set<std::string> informed;
-    // newly_informed set to keep the track of the nodes just aware of the info in the last round
-    std::unordered_set<std::string> newly_informed;
-
-    informed.insert(startNode);
-    newly_informed.insert(startNode);
-
-    while (!newly_informed.empty())
-    {
-        // nextRound set to store the nodes who will be conveyed the info in the next round
-        std::unordered_set<std::string> nextRound;
-        roundCount++;
-
-        for (const std::string &u : newly_informed)
-        {
-            for (auto &neigh : AdjList[u])
+            
+            if(topScore_in_ith_Community>TopScoreOfCommunity)
             {
-                std::string v = neigh.adjacentNode;
-                int wt = neigh.weight;
-
-                if (informed.find(v) == informed.end())
+                //storing the community with top score
+                TopScoreOfCommunity=topScore_in_ith_Community;
+                for(int j=0;j<3;j++)
                 {
-                    double cost = BASE_COST / (double)wt; 
-                    totalCost += cost;
-                    // both nextRound and informed being updated
-                    nextRound.insert(v);
-                    informed.insert(v);
+                    bridgeRecommedate[j].second=bridgeRecommedationCommunity[j].second;
+                    bridgeRecommedate[j].first=bridgeRecommedationCommunity[j].first;
+                }
+                TopCommunity=i+1;//as communityID is 1-indexed based
+            }            
+        }
+        std::cout << GREEN << "Successfully completed Bridge Recommedation" << RESET << std::endl;
+
+        std::ofstream BridgeRecommedationFile(BRIDGE_RECOMMEDATION);
+        if(!BridgeRecommedationFile.is_open())
+        {
+            std::cout << RED << "Cannot write Bridge Recommedation " << RESET << std::endl;
+        }
+        std::cout << YELLOW << "Top 3 Bridge Recommedation from " << startNode << "of community " << targetUser.communityID << " to community " << TopCommunity << RESET << std::endl;
+        BridgeRecommedationFile << "ID,Domain,Strength,Betweenness,Final Score\n";
+        std::cout << "ID\tDomain\tStrength\tBetweenness\tCommunityID\tFinal Score" << std::endl;
+        for(int i=0;i<3;i++)
+        {
+            //writing recommedation in file .csv
+            BridgeRecommedationFile << bridgeRecommedate[i].second << "," << NodeMap[bridgeRecommedate[i].second].domain << "," << NodeMap[bridgeRecommedate[i].second].strength << "," << NodeMap[bridgeRecommedate[i].second].normalized_bc << "," << bridgeRecommedate[i].first << '\n';
+            //printing bridge recommedation
+            std::cout << bridgeRecommedate[i].second << "\t" << NodeMap[bridgeRecommedate[i].second].domain << "\t" << NodeMap[bridgeRecommedate[i].second].strength << "\t" << NodeMap[bridgeRecommedate[i].second].normalized_bc << "\t" << TopCommunity << "\t" << bridgeRecommedate[i].first << '\n';
+        }
+        BridgeRecommedationFile.close();//closing the file pointer
+
+        //for computing 
+        std::pair<std::string,std::string> bridge=GlobalBridgeRecommedation(targetUser.communityID-1,TopCommunity-1);
+        CompareCost(bridge);
+    }
+
+
+    double CostCalculation(std::string startNode)
+    {
+        if (NodeMap.find(startNode) == NodeMap.end())
+        {
+            std::cout << RED << "Invalid start node ID: " << startNode << RESET << std::endl;
+            return -1;
+        }
+        // Total Cost function to track the total cost being spent
+        double totalCost = 0.0;
+        // Roundcount to keep the count of the rounds being required to spread the info
+        int roundCount = 0;
+        // informed set to keep the track of the nodes already aware of the info
+        std::unordered_set<std::string> informed;
+        // newly_informed set to keep the track of the nodes just aware of the info in the last round
+        std::unordered_set<std::string> newly_informed;
+
+        informed.insert(startNode);
+        newly_informed.insert(startNode);
+
+        while (!newly_informed.empty())
+        {
+            // nextRound set to store the nodes who will be conveyed the info in the next round
+            std::unordered_set<std::string> nextRound;
+            roundCount++;
+
+            for (const std::string &u : newly_informed)
+            {
+                for (auto &neigh : AdjList[u])
+                {
+                    std::string v = neigh.adjacentNode;
+                    int wt = neigh.weight;
+
+                    if (informed.find(v) == informed.end())
+                    {
+                        double cost = BASE_COST / (double)wt; 
+                        totalCost += cost;
+                        // both nextRound and informed being updated
+                        nextRound.insert(v);
+                        informed.insert(v);
+                    }
                 }
             }
+            // deleting the previously store nodes of newly_informed
+            newly_informed = nextRound;
         }
-        // deleting the previously store nodes of newly_informed
-        newly_informed = nextRound;
+
+        std::cout << GREEN << "Information reached " << informed.size() << " / "
+                << NodeMap.size() << " nodes in " << roundCount << " rounds." << RESET << std::endl;
+
+        std::cout << YELLOW << "Total cost of information spread from " << startNode
+                << " = " << std::fixed << std::setprecision(6) << totalCost << RESET << std::endl;
+
+        return totalCost;
     }
 
-    std::cout << GREEN << "Information reached " << informed.size() << " / "
-              << NodeMap.size() << " nodes in " << roundCount << " rounds." << RESET << std::endl;
 
-    std::cout << YELLOW << "Total cost of information spread from " << startNode
-              << " = " << std::fixed << std::setprecision(6) << totalCost << RESET << std::endl;
-
-    return totalCost;
-}
-
-
-void CompareCost(std::pair<std::string,std::string> bridge)
-{
-    std::string u = bridge.first;
-    std::string v = bridge.second;
-
-    if (NodeMap.find(u) == NodeMap.end() || NodeMap.find(v) == NodeMap.end())
+    void CompareCost(std::pair<std::string,std::string> bridge)
     {
-        std::cout << RED << "Invalid bridge nodes provided." << RESET << std::endl;
-        return;
+        std::string u = bridge.first;
+        std::string v = bridge.second;
+
+        if (NodeMap.find(u) == NodeMap.end() || NodeMap.find(v) == NodeMap.end())
+        {
+            std::cout << RED << "Invalid bridge nodes provided." << RESET << std::endl;
+            return;
+        }
+
+        std::cout << CYAN << "=== Comparing Information Spread Cost Before and After Bridging ===" << RESET << std::endl;
+        std::cout << "Bridge: (" << u << ", " << v << ")" << std::endl;
+
+        // Cost before adding bridge
+        double costBeforeU= DEPLOY_COST+CostCalculation(u);
+        double costBeforeV= DEPLOY_COST+CostCalculation(v);
+        double totalCostBefore = costBeforeU + costBeforeV;
+
+        // Add temporary bridge
+        AdjList[u].push_back(AdjListNode(v, 1)); // neutral weight = 1
+        AdjList[v].push_back(AdjListNode(u, 1));
+
+        // Cost after adding bridge
+        double costAfterU= DEPLOY_COST+CostCalculation(u);
+        double totalCostAfter= costAfterU;
+
+        // Restore original graph (remove temporary bridge)
+        AdjList[u].pop_back();
+        AdjList[v].pop_back();
+
+        // Compute improvement %
+        double improvement = ((totalCostBefore - totalCostAfter) / totalCostBefore) * 100.0;
+
+        std::cout << CYAN << "=== COST COMPARISON RESULTS ===" << RESET << std::endl;
+        std::cout << "Before Bridging : " << YELLOW << std::fixed << std::setprecision(6) << totalCostBefore << RESET << std::endl;
+        std::cout << "After Bridging  : " << GREEN << std::fixed << std::setprecision(6) << totalCostAfter << RESET << std::endl;
+        std::cout << "Improvement     : " << std::fixed << std::setprecision(2)
+                << improvement << "% reduction in total cost" << std::endl;
+
+        // Save results (append mode)
+        std::ofstream resultsFile("InformationCostComparison.csv", std::ios::app);
+        resultsFile << "u,v,Total Cost Before,Total Cost after,Improvement" << '\n';
+        if (resultsFile.is_open())
+        {
+            resultsFile << u << "," << v << ","
+                        << std::fixed << std::setprecision(6)
+                        << totalCostBefore << "," << totalCostAfter << ","
+                        << improvement << "\n";
+            resultsFile.close();
+        }
+        else
+        {
+            std::cout << RED << "Could not write results to InformationCostComparison.csv" << RESET << std::endl;
+        }
     }
-
-    std::cout << CYAN << "=== Comparing Information Spread Cost Before and After Bridging ===" << RESET << std::endl;
-    std::cout << "Bridge: (" << u << ", " << v << ")" << std::endl;
-
-    // Cost before adding bridge
-    double costBeforeU= DEPLOY_COST+CostCalculation(u);
-    double costBeforeV= DEPLOY_COST+CostCalculation(v);
-    double totalCostBefore = costBeforeU + costBeforeV;
-
-    // Add temporary bridge
-    AdjList[u].push_back(AdjListNode(v, 1)); // neutral weight = 1
-    AdjList[v].push_back(AdjListNode(u, 1));
-
-    // Cost after adding bridge
-    double costAfterU= DEPLOY_COST+CostCalculation(u);
-    double totalCostAfter= costAfterU;
-
-    // Restore original graph (remove temporary bridge)
-    AdjList[u].pop_back();
-    AdjList[v].pop_back();
-
-    // Compute improvement %
-    double improvement = ((totalCostBefore - totalCostAfter) / totalCostBefore) * 100.0;
-
-    std::cout << CYAN << "=== COST COMPARISON RESULTS ===" << RESET << std::endl;
-    std::cout << "Before Bridging : " << YELLOW << std::fixed << std::setprecision(6) << totalCostBefore << RESET << std::endl;
-    std::cout << "After Bridging  : " << GREEN << std::fixed << std::setprecision(6) << totalCostAfter << RESET << std::endl;
-    std::cout << "Improvement     : " << std::fixed << std::setprecision(2)
-              << improvement << "% reduction in total cost" << std::endl;
-
-    // Save results (append mode)
-    std::ofstream resultsFile("InformationCostComparison.csv", std::ios::app);
-    resultsFile << "u,v,Total Cost Before,Total Cost after,Improvement" << '\n';
-    if (resultsFile.is_open())
-    {
-        resultsFile << u << "," << v << ","
-                    << std::fixed << std::setprecision(6)
-                    << totalCostBefore << "," << totalCostAfter << ","
-                    << improvement << "\n";
-        resultsFile.close();
-    }
-    else
-    {
-        std::cout << RED << "Could not write results to InformationCostComparison.csv" << RESET << std::endl;
-    }
-}
+};
